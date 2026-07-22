@@ -1,1 +1,54 @@
-Jodus 機率分配互動實驗室 (Jodus Probability Distribution Interactive Lab)專為大二統計學與商業決策分析課程設計的沈浸式互動網頁實驗室。本專案將抽象的機率與統計理論轉化為直覺的視覺化互動，幫助學生透過生活化與商管情境，深刻體會各類機率分配的特性、期望值與變異數。👉 立即線上體驗：https://jodusocnncwiy.github.io/probability-distributions/🌟 專案特色 (Features)完整涵蓋 8 大經典機率分配：離散型 (Discrete)：二項分配、超幾何分配、幾何分配、卜瓦松分配、負二項分配。連續型 (Continuous)：均勻分配、常態分配、指數分配。直覺的參數滑桿與即時連動：動態調整參數（如 $n, p, \mu, \sigma, \lambda$ 等），圖表與統計量在毫秒內同步更新。生活化與商管實例對應：每項分配皆搭配專屬的生活情境（如籃球員投籃、品管抽檢、客服來電量、績效考核等）。完整統計指標呈現：即時計算並顯示對應的平均數（期望值）與變異數。清爽高畫質介面：採用極具質感的青藍色系 (#CCFFFF) 背景與現代 Tailwind CSS 響應式寬螢幕設計，無須安裝任何套件，開啟即用。📊 收錄模組與實例分配類型模組名稱生活/商管實例離散型二項分配 (Binomial)籃球員的投籃命中數離散型超幾何分配 (Hypergeometric)批次品管瑕疵品抽檢離散型幾何分配 (Geometric)直到首次推銷成功次數離散型卜瓦松分配 (Poisson)客服中心單位時間來電數離散型負二項分配 (Negative Binomial)達成第 r 筆訂單所需的總拜訪數連續型均勻分配 (Uniform)公車班次隨機等候時間連續型常態分配 (Normal)員工年度績效考核分數連續型指數分配 (Exponential)機器設備故障間隔時間🚀 快速開始 (Quick Start)本專案支援純網頁直接存取，免除複雜的建置工具：直接前往線上網頁：點擊上方提供的線上連結 https://jodusocnncwiy.github.io/probability-distributions/ 即可在任何現代瀏覽器（Chrome, Edge, Safari, Firefox）上直接體驗！本地執行（選填）：如果您希望下載源碼研究，直接將專案中的 index.html 雙擊用瀏覽器打開即可。🛠️ 技術堆疊 (Tech Stack)前端結構：HTML5, Tailwind CSS (CDN)資料視覺化：Chart.js圖示庫：Font Awesome 6字型排版：Inter 現代無襯線字體💡 貢獻與回饋 (Contributing)歡迎提出 Issues 或 Pull Requests 來讓這個教學實驗室更加完善！📜 授權條款 (License)本專案採用 MIT License 授權條款。
+# **Jodus 機率分配互動實驗室 (Jodus Probability Distribution Interactive Lab)**
+
+專為**大二統計學與商業決策分析課程**設計的沈浸式互動網頁實驗室。本專案將抽象的機率與統計理論轉化為直覺的視覺化互動，幫助學生透過生活化與商管情境，深刻體會各類機率分配的特性、期望值與變異數。
+
+👉 **立即線上體驗**：[https://jodusocnncwiy.github.io/probability-distributions/](https://jodusocnncwiy.github.io/probability-distributions/)
+
+## **🌟 專案特色 (Features)**
+
+* **完整涵蓋 8 大經典機率分配**：  
+  * **離散型 (Discrete)**：二項分配、超幾何分配、幾何分配、卜瓦松分配、負二項分配。  
+  * **連續型 (Continuous)**：均勻分配、常態分配、指數分配。  
+* **直覺的參數滑桿與即時連動**：動態調整參數（如 ![][image1] 等），圖表與統計量在毫秒內同步更新。  
+* **生活化與商管實例對應**：每項分配皆搭配專屬的生活情境（如籃球員投籃、品管抽檢、客服來電量、績效考核等）。  
+* **完整統計指標呈現**：即時計算並顯示對應的**平均數（期望值）與變異數**。  
+* **清爽高畫質介面**：採用極具質感的青藍色系 (\#CCFFFF) 背景與現代 Tailwind CSS 響應式寬螢幕設計，無須安裝任何套件，開啟即用。
+
+## **📊 收錄模組與實例**
+
+| 分配類型 | 模組名稱 | 生活/商管實例 |
+| :---- | :---- | :---- |
+| **離散型** | 二項分配 (Binomial) | 籃球員的投籃命中數 |
+| **離散型** | 超幾何分配 (Hypergeometric) | 批次品管瑕疵品抽檢 |
+| **離散型** | 幾何分配 (Geometric) | 直到首次推銷成功次數 |
+| **離散型** | 卜瓦松分配 (Poisson) | 客服中心單位時間來電數 |
+| **離散型** | 負二項分配 (Negative Binomial) | 達成第 r 筆訂單所需的總拜訪數 |
+| **連續型** | 均勻分配 (Uniform) | 公車班次隨機等候時間 |
+| **連續型** | 常態分配 (Normal) | 員工年度績效考核分數 |
+| **連續型** | 指數分配 (Exponential) | 機器設備故障間隔時間 |
+
+## **🚀 快速開始 (Quick Start)**
+
+本專案支援純網頁直接存取，免除複雜的建置工具：
+
+1. **直接前往線上網頁**：  
+   點擊上方提供的線上連結 [https://jodusocnncwiy.github.io/probability-distributions/](https://jodusocnncwiy.github.io/probability-distributions/) 即可在任何現代瀏覽器（Chrome, Edge, Safari, Firefox）上直接體驗！  
+2. **本地執行（選填）**：  
+   如果您希望下載源碼研究，直接將專案中的 index.html 雙擊用瀏覽器打開即可。
+
+## **🛠️ 技術堆疊 (Tech Stack)**
+
+* **前端結構**：HTML5, Tailwind CSS (CDN)  
+* **資料視覺化**：Chart.js  
+* **圖示庫**：Font Awesome 6  
+* **字型排版**：Inter 現代無襯線字體
+
+## **💡 貢獻與回饋 (Contributing)**
+
+歡迎提出 Issues 或 Pull Requests 來讓這個教學實驗室更加完善！
+
+## **📜 授權條款 (License)**
+
+本專案採用 [MIT License](http://docs.google.com/LICENSE) 授權條款。
+
+[image1]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAAaCAYAAABIIVmfAAAEiklEQVR4Xu1YXYiNQRj+Trvk/yfWsj9nzjm7WTZycVBKIoSLdbFKSmpvcGFvkBVSS20ilM0NKbmxJUWtjYu9EC4UJYUtUWhLkkTt1tpYz3NmZs+c2e/3dGy2vqfevm/ed+Y577wz7zvzHceJESNGjBgTGInq6up5FRUVM2xDjHEAA59KpS4JIYYhl6Eqt/vE+PdIJJPJ61iAb5CltjHGOABZsBXB/wNptW0xxgHpdLoSwe+DPIx8HtTX18/CwG11dXW1bGez2Um1tbUrkVZNJLb7BwFci8jHw4ltPsmVyWQWo5mwugeipqZmOfwQpo4+VlZWTjd1UYAdO0X5WSCRg2cA4zshQ5A1ts0T6hC5AjmFgf0I1B48u/Hch+cJyA+8b7LHeQGLuEDVw9OQD5CLkGuQ3ZAnsLU5ERYBwa9WPMcNdTnaXeC629jYONnQBwLzXIixtyAjHnLNHhMW8Gctxg/jN9ptmydYuyD7MTiLwQOQXuzU2bQJuSs+wnbUHucF9N0Lvl1cNIz9jfdjUJfRhnaziHhQqUlxV23TOpXu70XhogSCWQR/3mJcD95X0A+0H+H5Cs8lnC8zwx4XFvB1LjieUfhu213BgNERFRxepTZom9IzYIfMMX5gUDhRLpoaOxpsIbNgRBjBDILi+YxnxtBxUQa4yGZfPyCTpmJMN4XvWg+OJuh+ckHM/kUggcVrIRfkTxTfchCyfr2uqqqar3XcydANccJm3xBgibgtrANJ/cYgzpdVZmcvcDeifw+k16z3bosSBJWRv5jxpl7ITcHFzJr6iEiAo5W+gmcj+YT8JghXahsaGmZiwGMGzcl/SOTqLOSpLklhYZSIDq1jSgqZngWL7Aej/o/yOPnFLViUIKhF68eFoMbUC5eNFxEM/mHIG2Y+swu/9QDtvtAXGOFSavCepsM8UBTpGX2rgW4OJc9QCFUihrDTt2sd2msgg3RW60LwcNfybt2sdeai0B88LyB402jz41MLUJCRaqP00Wb21fDjU9DB/wqu1VopZDaMmPP3BScIGTZLTVLWxly5wPtmoQ48/FAD3r9A+iHpPEsearIjcH4X27wyCnnzuK+zKQoPZLdS8YuzTemaWU4gB2kI4mNf6F/qXal8umr6ZCKIz8n7wnNzh2mAPgPdZ0iXE+avCTjXTuf0DicUyTs6CLmpnWQKs6+QB01TnmUUuRIB2yc8n4P7Bp4vIJ1myQjiSeXr/28hg3AScg9yANKrbF26pATxMeDgPCtkqWXgn6J9yjyQTQTxYex62AbwbHHG1npdvr9jAy+zbGPBybp9gNBpVRtz10gTSXl7GnObMUpEJ5pl/C4gv91PIwRPB30ThVdET14vPg1yMQs4N9vmBh++sqS8atrBz4H8/B03H0sBrvB54ZKaSZf67wM/ntx3hMfkveDJVyRKzVcapGTtPetYqw/dHDh7DjKI9y1uWWXCi4dIFnHV9OMrBqXmKxXKEZSd9sGVkjX7iJD1NSdIwXVmHwuuPBpC/n1xh7y2zQO+fEWg1HwTDjx3/qudFyNGjBgxYpQSfwHz8GM8BNY8ZAAAAABJRU5ErkJggg==>
