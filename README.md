@@ -1,54 +1,44 @@
-# **Jodus 機率分配互動實驗室 (Jodus Probability Distribution Interactive Lab)**
+# Jodus機率分配互動實驗室
 
-專為**大二統計學與商業決策分析課程**設計的沈浸式互動網頁實驗室。本專案將抽象的機率與統計理論轉化為直覺的視覺化互動，幫助學生透過生活化與商管情境，深刻體會各類機率分配的特性、期望值與變異數。
+**假如你是超商店長：八道每天都會遇到的機率題**
 
-👉 **立即線上體驗**：[https://jodusocnncwiy.github.io/probability-distributions/](https://jodusocnncwiy.github.io/probability-distributions/)
+給大學部統計學課程使用的互動教學網頁，可在課堂投影示範，也可讓學生自行操作。全站以「超商店長」為情境，涵蓋 5 種間斷型與 3 種連續型機率分配。學生可以拖曳選取任一段範圍，即時算出機率，從圖上建立「長條高度＝機率」、「曲線下面積＝機率」的直覺。
 
-## **🌟 專案特色 (Features)**
+👉 線上版：<https://jodusocnncwiy.github.io/probability-distributions/>
 
-* **完整涵蓋 8 大經典機率分配**：  
-  * **離散型 (Discrete)**：二項分配、超幾何分配、幾何分配、卜瓦松分配、負二項分配。  
-  * **連續型 (Continuous)**：均勻分配、常態分配、指數分配。  
-* **直覺的參數滑桿與即時連動**：動態調整參數（如 ![][image1] 等），圖表與統計量在毫秒內同步更新。  
-* **生活化與商管實例對應**：每項分配皆搭配專屬的生活情境（如籃球員投籃、品管抽檢、客服來電量、績效考核等）。  
-* **完整統計指標呈現**：即時計算並顯示對應的**平均數（期望值）與變異數**。  
-* **清爽高畫質介面**：採用極具質感的青藍色系 (\#CCFFFF) 背景與現代 Tailwind CSS 響應式寬螢幕設計，無須安裝任何套件，開啟即用。
+## 單元內容（10 頁）
 
-## **📊 收錄模組與實例**
+| 頁 | 主題 | 店長的問題 |
+|---|---|---|
+| 1 | 先猜一猜 | 四道題先憑直覺猜機率，再揭曉答案 |
+| 2 | 間斷與連續 | 機率質量函數與機率密度函數；單一個值的機率為何是 0 |
+| 3 | 二項分配 | 中獎率 0.2，20 位客人中剛好 6 人中獎 |
+| 4 | 超幾何分配 | 8 位 PT 中有 5 位學生，隨機找 3 位，其中 2 位是學生 |
+| 5 | Poisson 分配 | 每週平均 3 次抱怨，四週內剛好 6 次 |
+| 6 | 幾何與負二項分配 | 第 3 次才學會收銀機；第 50 位客人剛好是第 4 位買茶葉蛋的人 |
+| 7 | 均勻分配 | 物流車 20:50～21:20 抵達，同事 21:03 下班前等得到的機率 |
+| 8 | 常態分配 | 營業額平均 10 萬、標準差 1 萬，低於 8.5 萬元的機率 |
+| 9 | 指數分配 | 客人平均每 2 分鐘來 1 位，等 5 分鐘都沒有客人的機率 |
+| 10 | 自我檢測 | 6 題，取材自常見迷思，作答後立即顯示解析 |
 
-| 分配類型 | 模組名稱 | 生活/商管實例 |
-| :---- | :---- | :---- |
-| **離散型** | 二項分配 (Binomial) | 籃球員的投籃命中數 |
-| **離散型** | 超幾何分配 (Hypergeometric) | 批次品管瑕疵品抽檢 |
-| **離散型** | 幾何分配 (Geometric) | 直到首次推銷成功次數 |
-| **離散型** | 卜瓦松分配 (Poisson) | 客服中心單位時間來電數 |
-| **離散型** | 負二項分配 (Negative Binomial) | 達成第 r 筆訂單所需的總拜訪數 |
-| **連續型** | 均勻分配 (Uniform) | 公車班次隨機等候時間 |
-| **連續型** | 常態分配 (Normal) | 員工年度績效考核分數 |
-| **連續型** | 指數分配 (Exponential) | 機器設備故障間隔時間 |
+## 特色
 
-## **🚀 快速開始 (Quick Start)**
+- **拖曳算機率**：在圖上拖曳選取範圍，也可以用左尾、右尾按鈕；選取的機率會標在圖上和統計列。
+- **一鍵套用題目**：每頁都有「套用題目設定」按鈕，參數和選取範圍會直接帶入店長的題目。
+- **看得見的參數效果**：常態分配固定座標軸，σ 變大時曲線會明顯變矮變寬；間斷型分配的橫軸畫到累積機率 99.95% 為止，尾端不會被截掉。
+- **圖上標示**：期望值（灰色虛線）、±1 標準差（紫色括號）；常態分配另有 z 值刻度與 68–95–99.7 法則。
+- **對照與延伸**：超幾何可疊加「抽後放回」的二項分配；指數分配有無記憶性示範。研究所延伸內容收在虛線摺疊框，包含常態近似與連續性校正、有限母體校正因子、Poisson 與計數資料迴歸、負二項的兩種定義、反函數轉換法、指數與 Poisson 的關係。
+- **16:9 投影版面**：以 1920×1080 畫布設計，依視窗等比例縮放，按 F 鍵切換全螢幕；手機會自動改成上下排列。
 
-本專案支援純網頁直接存取，免除複雜的建置工具：
+## 技術
 
-1. **直接前往線上網頁**：  
-   點擊上方提供的線上連結 [https://jodusocnncwiy.github.io/probability-distributions/](https://jodusocnncwiy.github.io/probability-distributions/) 即可在任何現代瀏覽器（Chrome, Edge, Safari, Firefox）上直接體驗！  
-2. **本地執行（選填）**：  
-   如果您希望下載源碼研究，直接將專案中的 index.html 雙擊用瀏覽器打開即可。
+單一 HTML 檔，使用原生 JavaScript＋SVG，只從外部載入 Noto Sans TC 字型與 KaTeX 數學排版，免安裝即可使用。所有機率都已用 Python（SciPy）逐一驗證。
 
-## **🛠️ 技術堆疊 (Tech Stack)**
+## 版本
 
-* **前端結構**：HTML5, Tailwind CSS (CDN)  
-* **資料視覺化**：Chart.js  
-* **圖示庫**：Font Awesome 6  
-* **字型排版**：Inter 現代無襯線字體
+- v02（2026-11）：全面改版。改為超商店長情境、紫＋桃紅配色、16:9 投影版面，新增先猜一猜、間斷與連續、拖曳選取範圍算機率、自我檢測與研究所延伸；修正負二項與幾何分配被截尾、超幾何參數不合理、常態分配調 σ 看不出變化等問題。
+- v01（2026-07）：初版，標籤 `v01-2026-07`。
 
-## **💡 貢獻與回饋 (Contributing)**
+---
 
-歡迎提出 Issues 或 Pull Requests 來讓這個教學實驗室更加完善！
-
-## **📜 授權條款 (License)**
-
-本專案採用 [MIT License](http://docs.google.com/LICENSE) 授權條款。
-
-[image1]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAAaCAYAAABIIVmfAAAEiklEQVR4Xu1YXYiNQRj+Trvk/yfWsj9nzjm7WTZycVBKIoSLdbFKSmpvcGFvkBVSS20ilM0NKbmxJUWtjYu9EC4UJYUtUWhLkkTt1tpYz3NmZs+c2e/3dGy2vqfevm/ed+Y577wz7zvzHceJESNGjBgTGInq6up5FRUVM2xDjHEAA59KpS4JIYYhl6Eqt/vE+PdIJJPJ61iAb5CltjHGOABZsBXB/wNptW0xxgHpdLoSwe+DPIx8HtTX18/CwG11dXW1bGez2Um1tbUrkVZNJLb7BwFci8jHw4ltPsmVyWQWo5mwugeipqZmOfwQpo4+VlZWTjd1UYAdO0X5WSCRg2cA4zshQ5A1ts0T6hC5AjmFgf0I1B48u/Hch+cJyA+8b7LHeQGLuEDVw9OQD5CLkGuQ3ZAnsLU5ERYBwa9WPMcNdTnaXeC629jYONnQBwLzXIixtyAjHnLNHhMW8Gctxg/jN9ptmydYuyD7MTiLwQOQXuzU2bQJuSs+wnbUHucF9N0Lvl1cNIz9jfdjUJfRhnaziHhQqUlxV23TOpXu70XhogSCWQR/3mJcD95X0A+0H+H5Cs8lnC8zwx4XFvB1LjieUfhu213BgNERFRxepTZom9IzYIfMMX5gUDhRLpoaOxpsIbNgRBjBDILi+YxnxtBxUQa4yGZfPyCTpmJMN4XvWg+OJuh+ckHM/kUggcVrIRfkTxTfchCyfr2uqqqar3XcydANccJm3xBgibgtrANJ/cYgzpdVZmcvcDeifw+k16z3bosSBJWRv5jxpl7ITcHFzJr6iEiAo5W+gmcj+YT8JghXahsaGmZiwGMGzcl/SOTqLOSpLklhYZSIDq1jSgqZngWL7Aej/o/yOPnFLViUIKhF68eFoMbUC5eNFxEM/mHIG2Y+swu/9QDtvtAXGOFSavCepsM8UBTpGX2rgW4OJc9QCFUihrDTt2sd2msgg3RW60LwcNfybt2sdeai0B88LyB402jz41MLUJCRaqP00Wb21fDjU9DB/wqu1VopZDaMmPP3BScIGTZLTVLWxly5wPtmoQ48/FAD3r9A+iHpPEsearIjcH4X27wyCnnzuK+zKQoPZLdS8YuzTemaWU4gB2kI4mNf6F/qXal8umr6ZCKIz8n7wnNzh2mAPgPdZ0iXE+avCTjXTuf0DicUyTs6CLmpnWQKs6+QB01TnmUUuRIB2yc8n4P7Bp4vIJ1myQjiSeXr/28hg3AScg9yANKrbF26pATxMeDgPCtkqWXgn6J9yjyQTQTxYex62AbwbHHG1npdvr9jAy+zbGPBybp9gNBpVRtz10gTSXl7GnObMUpEJ5pl/C4gv91PIwRPB30ThVdET14vPg1yMQs4N9vmBh++sqS8atrBz4H8/B03H0sBrvB54ZKaSZf67wM/ntx3hMfkveDJVyRKzVcapGTtPetYqw/dHDh7DjKI9y1uWWXCi4dIFnHV9OMrBqXmKxXKEZSd9sGVkjX7iJD1NSdIwXVmHwuuPBpC/n1xh7y2zQO+fEWg1HwTDjx3/qudFyNGjBgxYpQSfwHz8GM8BNY8ZAAAAABJRU5ErkJggg==>
+教學用虛構情境與數字，僅供課堂示範。© Jodus

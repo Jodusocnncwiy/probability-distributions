@@ -1,777 +1,918 @@
 <!DOCTYPE html>
-<html lang="zh-TW" class="h-full">
+<html lang="zh-Hant-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jodus機率分配互動實驗室</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- KaTeX CSS & JS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        customBg: '#CCFFFF',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body {
-            background-color: #CCFFFF;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jodus機率分配互動實驗室｜超商店長的八道機率題</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#FFFFFF;--wash:#F3F0FF;--line:#DDD8F5;--ink:#0A1045;--ink2:#555B7A;--muted:#7C819C;
+  --blue:#6C4BEF;--blue-soft:#DDD8F5;--coral:#D61FA3;--coral-soft:#F9DCF0;
+  --hilite:#F9E900;--deep:#A3127B;--good:#2E9D63;--r:10px;
+}
+*{box-sizing:border-box}
+html{font-size:16px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;line-height:1.65;font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+/* ---------- 頁首 ---------- */
+header.top{padding:22px clamp(16px,4vw,40px) 0;max-width:1320px;margin:0 auto}
+.brand{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px}
+.brand h1{margin:0;font-size:clamp(1.5rem,2.6vw,2.1rem);font-weight:900;letter-spacing:.02em}
+.brand p{margin:0;color:var(--ink2);font-size:.98rem}
+nav.tabs{max-width:1320px;margin:16px auto 0;padding:0 clamp(16px,4vw,40px);display:flex;gap:2px;overflow-x:auto;border-bottom:2px solid var(--line);scrollbar-width:thin}
+nav.tabs button{flex:0 0 auto;border:0;background:none;padding:10px 12px 12px;font-size:1rem;font-weight:500;color:var(--ink2);cursor:pointer;border-bottom:4px solid transparent;margin-bottom:-2px;border-radius:8px 8px 0 0;white-space:nowrap}
+nav.tabs button .n{display:inline-grid;place-items:center;width:1.5em;height:1.5em;border-radius:50%;background:var(--wash);color:var(--blue);font-size:.82em;font-weight:700;margin-right:5px}
+nav.tabs button:hover{background:var(--wash)}
+nav.tabs button[aria-selected="true"]{color:var(--ink);font-weight:700;border-bottom-color:var(--blue)}
+nav.tabs button[aria-selected="true"] .n{background:var(--blue);color:#fff}
+
+/* ---------- 主版面 ---------- */
+main{max-width:1320px;margin:0 auto;padding:18px clamp(16px,4vw,40px) 40px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,1fr);gap:24px;align-items:start}
+main.full{grid-template-columns:1fr}
+main.full .stage{display:none}
+.stage{position:sticky;top:10px}
+.statbar{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:baseline;padding:10px 14px;background:var(--wash);border-radius:var(--r) var(--r) 0 0;font-size:.95rem}
+.statbar .lbl{color:var(--muted);font-size:.85rem;margin-right:4px}
+.statbar .big{font-size:1.15rem;font-weight:700}
+.statbar .psel{margin-left:auto;color:var(--deep);font-weight:700;font-size:1.15rem}
+.chartwrap{border:1px solid var(--line);border-top:0;border-radius:0 0 var(--r) var(--r);background:#fff;position:relative}
+svg#chart text{paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+svg#chart{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;user-select:none}
+.hint{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;padding:8px 2px 0;font-size:.88rem;color:var(--ink2)}
+.hint kbd{font-family:inherit;background:var(--wash);border:1px solid var(--line);border-radius:5px;padding:0 6px;font-size:.85em}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sw{display:inline-block;width:16px;height:6px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.sw.dash{height:0;border-top:3px dashed var(--ink2);border-radius:0}
+
+/* ---------- 按鈕與控制項 ---------- */
+.btn{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;cursor:pointer;font-size:.92rem;min-height:38px}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+.btn.primary:hover{filter:brightness(1.08);color:#fff}
+.btn.coral{background:var(--coral);border-color:var(--coral);color:#fff;font-weight:700}
+.btn.coral:hover{color:#fff;filter:brightness(1.08)}
+.btn[aria-pressed="true"]{background:var(--coral-soft);border-color:var(--coral);color:var(--deep);font-weight:700}
+label.chk{display:flex;gap:8px;align-items:center;cursor:pointer;font-size:.95rem;padding:3px 0}
+label.chk input{width:18px;height:18px;accent-color:var(--blue);flex:0 0 auto}
+input[type=range]{width:100%;accent-color:var(--coral);height:28px}
+
+/* ---------- 側欄 ---------- */
+.panel{display:none}
+.panel.on{display:block}
+.panel h2{font-size:1.35rem;margin:0 0 6px;font-weight:900}
+.panel h3{font-size:1.05rem;margin:20px 0 6px;font-weight:700}
+.panel p{margin:6px 0}
+.lead{color:var(--ink2)}
+.box{border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin:12px 0;background:#fff}
+.box.wash{background:var(--wash);border-color:transparent}
+.box.try{border-left:5px solid var(--coral)}
+.box.try h3{margin-top:0}
+.box.try ol{margin:4px 0;padding-left:1.3em}
+.box.try li{margin:3px 0}
+.box.story{border-left:5px solid var(--blue);background:var(--wash);border-color:transparent;border-left-color:var(--blue)}
+.box.story .sq{margin:4px 0 8px;font-weight:500}
+.selbox{background:#fff;border:2px solid var(--coral-soft)}
+.selbox .pv{font-size:1.3rem;font-weight:900;color:var(--deep)}
+.tag{display:inline-block;font-size:.8rem;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--coral-soft);color:var(--deep);margin-right:6px;vertical-align:1px}
+.tag.blue{background:var(--blue-soft);color:#4B32B8}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:.95rem}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:700}
+.num{font-weight:700}
+.c-blue{color:#4B32B8} .c-coral{color:var(--deep)} .c-grey{color:var(--ink2)}
+.sl-row{display:grid;grid-template-columns:7.2em 1fr 5.2em;gap:8px;align-items:center;margin:4px 0}
+.sl-row output{text-align:right;font-weight:700}
+.sl-row .slab{font-size:.95em}
+ul.cond{margin:4px 0;padding-left:1.2em} ul.cond li{margin:2px 0}
+details.grad{margin:16px 0;border:1.5px dashed #B9AEF5;border-radius:var(--r);padding:4px 14px;background:#FBFAFF}
+details.grad summary{cursor:pointer;font-weight:700;padding:8px 0;color:#4B32B8}
+details.grad[open]{padding-bottom:12px}
+details.fold{margin:12px 0;border:1px solid var(--line);border-radius:var(--r);padding:2px 14px}
+details.fold summary{cursor:pointer;font-weight:700;padding:8px 0;color:var(--ink2)}
+details.fold[open]{padding-bottom:12px}
+.fx{text-align:center;margin:6px 0}
+table.dt{border-collapse:collapse;width:100%;font-size:.9rem;margin:6px 0}
+table.dt th,table.dt td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.dt th{background:var(--wash);color:var(--ink2);font-weight:700}
+table.dt td.grp{font-weight:700;color:#4B32B8;white-space:nowrap}
+table.dt button{border:0;background:none;color:#4B32B8;font-weight:700;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- 先猜一猜 ---------- */
+.panel.on.guessWrap{display:flex;flex-direction:column;gap:14px}
+.cards4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.gcard{border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;background:#fff}
+.gcard h3{margin:0;font-size:1.1rem}
+.gcard .scn{flex:1 1 auto;color:var(--ink)}
+.gcard .gv{font-size:1.3rem;font-weight:900;color:var(--deep);text-align:center}
+.gcard .res{min-height:7.5em}
+.gbar{display:grid;grid-template-columns:3.3em 1fr 4em;gap:8px;align-items:center;font-size:.9rem;margin:3px 0}
+.gbar .tr{height:16px;background:var(--wash);border-radius:8px;overflow:hidden}
+.gbar .tr span{display:block;height:100%;border-radius:8px}
+.gtop{display:flex;justify-content:space-between;align-items:center}
+
+/* ---------- 自我檢測 ---------- */
+.quiz{max-width:none}
+.q{border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;margin:14px 0}
+.q h3{margin:0 0 10px;font-size:1.05rem}
+.q .opts{display:grid;gap:8px}
+.q .opts button{text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;cursor:pointer;font-size:.98rem;line-height:1.5}
+.q .opts button:hover{border-color:var(--blue)}
+.q .opts button.right{border-color:var(--good);background:#E7F6EE}
+.q .opts button.wrong{border-color:var(--coral);background:var(--coral-soft)}
+.q .exp{display:none;margin-top:10px;padding:10px 14px;background:var(--wash);border-radius:8px}
+.q .exp.on{display:block}
+.score{font-size:1.1rem;font-weight:700;margin:10px 0}
+.qfoot{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+footer{max-width:1320px;margin:0 auto;padding:0 clamp(16px,4vw,40px) 30px;color:var(--muted);font-size:.85rem}
+
+/* ================= 16:9 投影畫布模式 ================= */
+body.stage{overflow:hidden;background:#E4DFF6;height:100vh}
+body.stage #app{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;background:var(--bg);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 0 1px #D3CCF2}
+body.stage label.chk input{width:22px;height:22px}
+body.stage header.top{max-width:none;margin:0;padding:14px 32px 0;display:flex;align-items:flex-end;gap:16px;border-bottom:2px solid var(--line)}
+body.stage .brand{flex-direction:column;gap:0;padding-bottom:12px;flex:0 0 auto}
+body.stage .brand h1{font-size:34px;line-height:1.15}
+body.stage .brand p{font-size:18px}
+body.stage nav.tabs{margin:0;padding:0;border-bottom:0;flex:1 1 auto;overflow:visible;gap:0}
+body.stage nav.tabs button{font-size:20px;padding:10px 9px 12px}
+body.stage .fsbtn{flex:0 0 auto;margin-bottom:12px;font-size:18px}
+body.stage main{max-width:none;margin:0;flex:1 1 auto;min-height:0;padding:16px 32px 8px;grid-template-columns:1120px 1fr;gap:32px;align-items:stretch}
+body.stage main.full{grid-template-columns:1fr}
+body.stage .stage{position:static;display:flex;flex-direction:column;min-height:0}
+body.stage main.full .stage{display:none}
+body.stage .statbar{font-size:20px;padding:8px 18px;gap:6px 28px}
+body.stage .statbar .lbl{font-size:18px}
+body.stage .statbar .big{font-size:28px}
+body.stage .statbar .psel{font-size:28px}
+body.stage .chartwrap{flex:1 1 auto;min-height:0;display:flex}
+body.stage svg#chart{width:100%;height:100%}
+body.stage .hint{font-size:17px;padding-top:4px}
+body.stage .toolbar .btn{font-size:17px;min-height:38px;padding:3px 14px}
+body.stage .side{min-height:0;overflow-y:auto;padding-right:14px;scrollbar-width:thin}
+body.stage .panel h2{font-size:34px;line-height:1.3}
+body.stage .panel h3{font-size:24px;margin-top:16px}
+body.stage .btn{font-size:19px;min-height:44px}
+body.stage .lead,body.stage .panel p{line-height:1.6}
+body.stage .kv{font-size:22px}
+body.stage table.dt{font-size:19px}
+body.stage input[type=range]{height:34px}
+body.stage .selbox .pv{font-size:30px}
+body.stage .tag{font-size:17px}
+body.stage footer{max-width:none;margin:0;padding:0 32px 8px;font-size:15px}
+body.stage main.full .side{overflow-y:auto}
+body.stage .gcard{padding:20px 22px;gap:10px}
+body.stage .gcard h3{font-size:26px}
+body.stage .gcard .gv{font-size:30px}
+body.stage .gbar{font-size:19px;grid-template-columns:3.6em 1fr 4.4em}
+body.stage .gbar .tr{height:22px}
+body.stage .guessWrap .box.try{margin:0}
+body.stage .guessWrap h2{margin-bottom:0}
+body.stage #quizBox{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 22px;align-items:start}
+body.stage .q h3{font-size:21px}
+body.stage .q .opts button{font-size:18px;padding:7px 12px}
+body.stage .quiz h2{font-size:30px}
+body.stage .quiz .lead{margin:0 0 4px}
+body.stage .q{margin:6px 0;padding:12px 16px}
+body.stage .q .exp{margin-top:8px;padding:8px 12px;line-height:1.5;font-size:17px}
+body.stage .qfoot .score{margin:4px 0}
+body:not(.stage) .fsbtn{display:none}
+
+@media (max-width:900px){
+  main{grid-template-columns:1fr}
+  .stage{position:static}
+  .cards4{grid-template-columns:1fr}
+  .sl-row{grid-template-columns:6em 1fr 4.6em}
+  .statbar .psel{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
 </head>
-<body class="bg-[#CCFFFF] text-slate-900 font-sans h-full flex flex-col antialiased">
+<body>
+<div id="app">
+<header class="top">
+  <div class="brand">
+    <h1>Jodus機率分配互動實驗室</h1>
+    <p>假如你是超商店長：八道每天都會遇到的機率題</p>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="單元步驟">
+    <button role="tab" data-tab="1" aria-selected="true"><span class="n">1</span>先猜一猜</button>
+    <button role="tab" data-tab="2" aria-selected="false"><span class="n">2</span>間斷與連續</button>
+    <button role="tab" data-tab="3" aria-selected="false"><span class="n">3</span>二項</button>
+    <button role="tab" data-tab="4" aria-selected="false"><span class="n">4</span>超幾何</button>
+    <button role="tab" data-tab="5" aria-selected="false"><span class="n">5</span>Poisson</button>
+    <button role="tab" data-tab="6" aria-selected="false"><span class="n">6</span>幾何與負二項</button>
+    <button role="tab" data-tab="7" aria-selected="false"><span class="n">7</span>均勻</button>
+    <button role="tab" data-tab="8" aria-selected="false"><span class="n">8</span>常態</button>
+    <button role="tab" data-tab="9" aria-selected="false"><span class="n">9</span>指數</button>
+    <button role="tab" data-tab="10" aria-selected="false"><span class="n">10</span>自我檢測</button>
+  </nav>
+  <button class="btn fsbtn" id="fsBtn" title="全螢幕（F 鍵）">全螢幕</button>
+</header>
 
-    <header class="bg-indigo-900 border-b border-indigo-950 py-4 px-8 shadow-xl flex items-center justify-between shrink-0 text-white">
-        <div class="flex items-center space-x-3">
-            <div class="bg-cyan-400 p-3 rounded-2xl text-slate-950 font-black text-2xl shadow-lg ring-2 ring-cyan-200">
-                <i class="fa-solid fa-chart-pie"></i>
-            </div>
-            <div>
-                <h1 class="text-2xl font-black tracking-tight text-white drop-shadow">Jodus機率分配互動實驗室</h1>
-                <p class="text-xs text-cyan-200 font-medium">大二統計與商業決策分析專用（8大經典分配・含即時平均數與變異數・寬螢幕高畫質體驗）</p>
-            </div>
-        </div>
-        <div class="flex items-center space-x-2">
-            <span class="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-cyan-500 text-slate-950 shadow-md border border-cyan-300">
-                <span class="w-2.5 h-2.5 mr-2 bg-rose-600 rounded-full animate-ping"></span> 期望值與變異數即時連動
-            </span>
-        </div>
-    </header>
+<main id="main" class="full">
+  <!-- ===== 圖表區 ===== -->
+  <section class="stage" aria-label="機率分配圖">
+    <div class="statbar" id="statbar"></div>
+    <div class="chartwrap">
+      <svg id="chart" viewBox="0 0 680 450" role="img" aria-label="機率分配圖">
+        <defs><clipPath id="plotClip"><rect id="clipRect" x="0" y="0" width="680" height="450"/></clipPath></defs><g id="layer"></g>
+      </svg>
+    </div>
+    <div class="toolbar">
+      <div class="hint">
+        <span><kbd>拖曳</kbd> 選一段範圍算機率</span>
+        <span><kbd>點一下</kbd> 只選一個值</span>
+        <span id="legendHint"></span>
+      </div>
+      <div class="presets">
+        <button class="btn" id="tailL">左尾：≤ 這個值</button>
+        <button class="btn" id="tailR">右尾：≥ 這個值</button>
+        <button class="btn" id="selClear">清除選取</button>
+        <button class="btn primary" id="applyStory">套用店長的題目</button>
+      </div>
+    </div>
+  </section>
 
-    <main class="flex-1 flex overflow-hidden max-w-[1920px] w-full mx-auto">
-        <nav class="w-88 bg-white/95 backdrop-blur-md border-r border-cyan-200 flex flex-col p-5 space-y-4 shrink-0 overflow-y-auto shadow-md">
-            
-            <!-- DISCRETE GROUP -->
-            <div>
-                <p class="text-xs font-black uppercase tracking-wider text-indigo-900 px-3 pb-2 flex items-center">
-                    <i class="fa-solid fa-cubes mr-2 text-indigo-600"></i> 離散型隨機變數 (Discrete)
-                </p>
-                <div class="space-y-2 mt-1">
-                    <button onclick="switchTab('binomial')" id="nav-binomial" class="tab-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-left font-bold text-sm transition-all bg-indigo-600 text-white shadow-md shadow-indigo-600/30">
-                        <i class="fa-solid fa-basketball w-5 text-center text-amber-300 text-lg"></i>
-                        <div>
-                            <div class="text-xs font-black">二項分配 (Binomial)</div>
-                            <div class="text-[10px] text-indigo-200 font-normal">籃球員的投籃命中數</div>
-                        </div>
-                    </button>
+  <!-- ===== 側欄 ===== -->
+  <section class="side">
 
-                    <button onclick="switchTab('hypergeometric')" id="nav-hypergeometric" class="tab-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-left font-bold text-sm transition-all text-slate-700 hover:bg-cyan-100 hover:text-indigo-900">
-                        <i class="fa-solid fa-boxes-stacked w-5 text-center text-purple-600 text-lg"></i>
-                        <div>
-                            <div class="text-xs font-black">超幾何分配 (Hypergeometric)</div>
-                            <div class="text-[10px] text-slate-500 font-normal">批次品管瑕疵品抽檢</div>
-                        </div>
-                    </button>
+    <!-- ---------- 1 先猜一猜 ---------- -->
+    <div class="panel on guessWrap" data-panel="1">
+      <h2>先猜一猜：店長的直覺準不準？</h2>
+      <p class="lead" style="margin:0">先不要算，憑感覺拉滑桿猜機率，再按「揭曉」。猜錯完全沒關係，差得愈多，等一下愈有感覺。</p>
+      <div class="cards4" id="guessCards"></div>
+      <div class="box try">
+        <h3>動手試試</h3>
+        <ol>
+          <li>四題都先猜完再揭曉，看看哪一題你差最多。</li>
+          <li>「剛好 6 人中獎」和「剛好 6 次抱怨」聽起來很像，機率卻差了好幾倍。想想看：為什麼？</li>
+          <li>按卡片下方的「去算算看」，到對應的分頁用圖表找出答案的來源。</li>
+        </ol>
+      </div>
+    </div>
 
-                    <button onclick="switchTab('geometric')" id="nav-geometric" class="tab-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-left font-bold text-sm transition-all text-slate-700 hover:bg-cyan-100 hover:text-indigo-900">
-                        <i class="fa-solid fa-bullseye w-5 text-center text-rose-600 text-lg"></i>
-                        <div>
-                            <div class="text-xs font-black">幾何分配 (Geometric)</div>
-                            <div class="text-[10px] text-slate-500 font-normal">直到首次推銷成功次數</div>
-                        </div>
-                    </button>
+    <!-- ---------- 2 間斷與連續 ---------- -->
+    <div class="panel" data-panel="2">
+      <h2>間斷型與連續型隨機變數</h2>
+      <p class="lead">店長每天面對的數字有兩種：一種是<strong>數得出來</strong>的（幾個人、幾次），一種是<strong>量出來</strong>的（多少錢、等多久）。</p>
+      <div class="presets" style="margin:6px 0 4px">
+        <button class="btn" id="demoDBtn" aria-pressed="true">間斷型：中獎人數</button>
+        <button class="btn" id="demoCBtn" aria-pressed="false">連續型：每日營業額</button>
+      </div>
+      <div class="box selbox" data-sel></div>
 
-                    <button onclick="switchTab('poisson')" id="nav-poisson" class="tab-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-left font-bold text-sm transition-all text-slate-700 hover:bg-cyan-100 hover:text-indigo-900">
-                        <i class="fa-solid fa-server w-5 text-center text-emerald-600 text-lg"></i>
-                        <div>
-                            <div class="text-xs font-black">卜瓦松分配 (Poisson)</div>
-                            <div class="text-[10px] text-slate-500 font-normal">客服中心單位時間來電數</div>
-                        </div>
-                    </button>
+      <div id="demoDText">
+        <h3>間斷型：機率是「長條的高度」</h3>
+        <p>20 位客人中有幾人中獎，只可能是 0、1、2、…、20。每一個值都有自己的機率，畫成長條圖，所有長條的高度加起來等於 1。這個函數叫做<strong>機率質量函數</strong>（PMF）：$P(X=x)$。</p>
+        <p>點一下 6 那根長條，就是「剛好 6 人中獎」的機率。</p>
+      </div>
+      <div id="demoCText" hidden>
+        <h3>連續型：機率是「曲線下的面積」</h3>
+        <p>營業額可以是 9.8 萬、9.83 萬、9.8321 萬……可能的值有無限多個。這時候用<strong>機率密度函數</strong>（PDF）$f(x)$ 描述，曲線下的總面積等於 1，<strong>一段區間的面積才是機率</strong>。</p>
+        <div class="sl-row"><span class="slab">區間寬度</span><input type="range" id="demoW" min="0" max="4" step="0.05" value="1" aria-label="以 10 萬為中心的區間寬度"><output id="demoWo"></output></div>
+        <p class="box wash" style="margin-top:6px">把寬度拉到 0：<strong>單一個值的機率是 0</strong>。所以「營業額剛好 10 萬元整」的機率是 0，對連續型來說，$P(X\le a)$ 和 $P(X<a)$ 相同。</p>
+      </div>
 
-                    <button onclick="switchTab('negative_binomial')" id="nav-negative_binomial" class="tab-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-left font-bold text-sm transition-all text-slate-700 hover:bg-cyan-100 hover:text-indigo-900">
-                        <i class="fa-solid fa-trophy w-5 text-center text-amber-500 text-lg"></i>
-                        <div>
-                            <div class="text-xs font-black">負二項分配 (Neg. Binomial)</div>
-                            <div class="text-[10px] text-slate-500 font-normal">達成第r筆訂單所需拜訪</div>
-                        </div>
-                    </button>
-                </div>
-            </div>
+      <h3>八種分配，問的是什麼？</h3>
+      <table class="dt">
+        <thead><tr><th>類型</th><th>分配</th><th>店長問的問題</th></tr></thead>
+        <tbody>
+          <tr><td class="grp" rowspan="5">間斷型<br><span style="font-weight:400;color:var(--ink2)">幾人、幾次</span></td><td><button data-go="3">二項</button></td><td>n 位客人中，中獎幾人？</td></tr>
+          <tr><td><button data-go="4">超幾何</button></td><td>不放回地挑 n 位 PT，有幾位學生？</td></tr>
+          <tr><td><button data-go="5">Poisson</button></td><td>一段時間內，收到幾次抱怨？</td></tr>
+          <tr><td><button data-go="6">幾何</button></td><td>第幾次練習才第一次學會？</td></tr>
+          <tr><td><button data-go="6">負二項</button></td><td>第幾位客人時，賣出第 r 顆茶葉蛋？</td></tr>
+          <tr><td class="grp" rowspan="3">連續型<br><span style="font-weight:400;color:var(--ink2)">多少、多久</span></td><td><button data-go="7">均勻</button></td><td>物流車在時段內什麼時候到？</td></tr>
+          <tr><td><button data-go="8">常態</button></td><td>今天的營業額是多少？</td></tr>
+          <tr><td><button data-go="9">指數</button></td><td>還要等多久才有下一位客人？</td></tr>
+        </tbody>
+      </table>
 
-            <!-- CONTINUOUS GROUP -->
-            <div class="pt-3 border-t border-cyan-200">
-                <p class="text-xs font-black uppercase tracking-wider text-indigo-900 px-3 pb-2 pt-2 flex items-center">
-                    <i class="fa-solid fa-wave-square mr-2 text-cyan-700"></i> 連續型隨機變數 (Continuous)
-                </p>
-                <div class="space-y-2 mt-1">
-                    <button onclick="switchTab('uniform')" id="nav-uniform" class="tab-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-left font-bold text-sm transition-all text-slate-700 hover:bg-cyan-100 hover:text-indigo-900">
-                        <i class="fa-solid fa-arrows-split-up-and-left w-5 text-center text-cyan-600 text-lg"></i>
-                        <div>
-                            <div class="text-xs font-black">均勻分配 (Uniform)</div>
-                            <div class="text-[10px] text-slate-500 font-normal">公車班次隨機等候時間</div>
-                        </div>
-                    </button>
+      <div class="box try">
+        <h3>動手試試</h3>
+        <ol>
+          <li>在「間斷型」點一下 4 那根長條，再拖曳選 3～5，看機率怎麼加總。</li>
+          <li>切到「連續型」，把區間寬度慢慢拉到 0，看機率怎麼變。</li>
+          <li>想一想：「來客數」和「每位客人的消費金額」各是哪一型？</li>
+        </ol>
+      </div>
+      <details class="grad">
+        <summary>研究所延伸：累積分配函數（CDF）</summary>
+        <p>兩種類型都可以用<strong>累積分配函數</strong> $F(x)=P(X\le x)$ 統一描述。間斷型的 $F(x)$ 是階梯狀，連續型則是平滑曲線，且 $f(x)=F'(x)$。工具列的「左尾」按鈕算的就是 $F(x)$；任何區間機率都可以寫成 $P(a<X\le b)=F(b)-F(a)$。</p>
+      </details>
+    </div>
 
-                    <button onclick="switchTab('normal')" id="nav-normal" class="tab-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-left font-bold text-sm transition-all text-slate-700 hover:bg-cyan-100 hover:text-indigo-900">
-                        <i class="fa-solid fa-ruler w-5 text-center text-indigo-600 text-lg"></i>
-                        <div>
-                            <div class="text-xs font-black">常態分配 (Normal)</div>
-                            <div class="text-[10px] text-slate-500 font-normal">員工年度績效考核分數</div>
-                        </div>
-                    </button>
+    <!-- ---------- 3 二項 ---------- -->
+    <div class="panel" data-panel="3">
+      <h2>二項分配（Binomial）</h2>
+      <div class="box story"><span class="tag blue">店長的問題</span>
+        <p class="sq">超商舉辦抽獎活動，中獎率 0.2（p）。晚上陸續來了 20 位（n）客人，其中剛好 6 人（x）中獎的機率是多少？</p>
+        <button class="btn primary" data-apply="binom">套用題目設定</button>
+      </div>
+      <div class="box selbox" data-sel></div>
+      <div class="sl-row"><span class="slab">客人數 n</span><input type="range" data-d="binom" data-k="n" min="1" max="40" step="1" aria-label="客人數 n"><output data-o="binom-n"></output></div>
+      <div class="sl-row"><span class="slab">中獎率 p</span><input type="range" data-d="binom" data-k="p" min="0.05" max="0.95" step="0.01" aria-label="中獎率 p"><output data-o="binom-p"></output></div>
+      <h3>什麼時候用二項分配？</h3>
+      <ul class="cond">
+        <li>做 <strong>n 次</strong>固定次數的試驗（20 位客人各抽一次）。</li>
+        <li>每次只有兩種結果：中獎或沒中獎。</li>
+        <li>每次中獎率都是 <strong>p</strong>，而且彼此<strong>獨立</strong>。</li>
+      </ul>
+      <details class="fold"><summary>公式與店長題目的計算過程</summary>
+        <p class="fx">$$P(X=x)=\binom{n}{x}p^{x}(1-p)^{n-x}$$</p>
+        <p class="fx">$$E(X)=np,\qquad Var(X)=np(1-p)$$</p>
+        <p class="box wash num">P(X = 6) = C(20, 6) × 0.2⁶ × 0.8¹⁴<br>= 38,760 × 0.000064 × 0.043980 ≈ <span class="c-coral">0.1091</span><br>E(X) = 20 × 0.2 = 4 人；Var(X) = 20 × 0.2 × 0.8 = 3.2</p>
+      </details>
+      <div class="box try">
+        <h3>動手試試</h3>
+        <ol>
+          <li>把中獎率 p 拉到 0.5，分配變成左右對稱；拉到 0.9，長尾巴跑到左邊。</li>
+          <li>按「右尾」看至少 6 人中獎的機率。店長準備 6 份獎品夠不夠？</li>
+          <li>把 n 拉到 40，看紫色括號（±1 標準差）變寬多少。</li>
+        </ol>
+      </div>
+      <details class="grad">
+        <summary>研究所延伸：以常態分配近似二項分配</summary>
+        <label class="chk"><input type="checkbox" id="binomApprox"> 在圖上疊加常態近似曲線（深藍色）</label>
+        <p>當 $np\ge5$ 且 $n(1-p)\ge5$ 時，二項分配可用 $N\!\left(np,\ np(1-p)\right)$ 近似。間斷型改用連續型計算時，要加減 0.5 做<strong>連續性校正</strong>：$P(X\le k)\approx\Phi\!\left(\frac{k+0.5-np}{\sqrt{np(1-p)}}\right)$。</p>
+        <p class="box wash num" id="binomApproxTxt"></p>
+      </details>
+    </div>
 
-                    <button onclick="switchTab('exponential')" id="nav-exponential" class="tab-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-left font-bold text-sm transition-all text-slate-700 hover:bg-cyan-100 hover:text-indigo-900">
-                        <i class="fa-solid fa-clock-rotate-left w-5 text-center text-teal-600 text-lg"></i>
-                        <div>
-                            <div class="text-xs font-black">指數分配 (Exponential)</div>
-                            <div class="text-[10px] text-slate-500 font-normal">機器設備故障間隔時間</div>
-                        </div>
-                    </button>
-                </div>
-            </div>
+    <!-- ---------- 4 超幾何 ---------- -->
+    <div class="panel" data-panel="4">
+      <h2>超幾何分配（Hypergeometric）</h2>
+      <div class="box story"><span class="tag blue">店長的問題</span>
+        <p class="sq">8 位（N）PT 員工當中，有 5 位（S）是學生。某時段隨機找 3 位（n）PT 上班，其中 2 人（x）是學生的機率是多少？</p>
+        <button class="btn primary" data-apply="hyper">套用題目設定</button>
+      </div>
+      <div class="box selbox" data-sel></div>
+      <div class="sl-row"><span class="slab">PT 總數 N</span><input type="range" data-d="hyper" data-k="N" min="2" max="30" step="1" aria-label="PT 總數 N"><output data-o="hyper-N"></output></div>
+      <div class="sl-row"><span class="slab">學生數 S</span><input type="range" data-d="hyper" data-k="S" min="0" max="8" step="1" aria-label="學生數 S"><output data-o="hyper-S"></output></div>
+      <div class="sl-row"><span class="slab">找幾位 n</span><input type="range" data-d="hyper" data-k="n" min="1" max="8" step="1" aria-label="找幾位 n"><output data-o="hyper-n"></output></div>
+      <p class="lead" style="font-size:.9em">S 和 n 不會超過 N：滑桿會自動限制範圍。</p>
+      <h3>和二項分配差在哪？</h3>
+      <ul class="cond">
+        <li>母體是<strong>有限的</strong>（只有 8 位 PT）。</li>
+        <li><strong>不放回</strong>：同一個人不會被排兩次，所以每挑一位，下一位是學生的機率都會改變，試驗<strong>不獨立</strong>。</li>
+      </ul>
+      <label class="chk"><input type="checkbox" id="hyperCmp"> 對照：如果「抽後放回」（二項分配，p = S/N），畫成深藍色空心圓點</label>
+      <details class="fold"><summary>公式與店長題目的計算過程</summary>
+        <p class="fx">$$P(X=x)=\frac{\binom{S}{x}\binom{N-S}{n-x}}{\binom{N}{n}}$$</p>
+        <p class="fx">$$E(X)=n\frac{S}{N},\qquad Var(X)=n\frac{S}{N}\left(1-\frac{S}{N}\right)\frac{N-n}{N-1}$$</p>
+        <p class="box wash num">P(X = 2) = C(5, 2) × C(3, 1) ÷ C(8, 3) = 10 × 3 ÷ 56 ≈ <span class="c-coral">0.5357</span><br>E(X) = 3 × 5/8 = 1.875 人</p>
+      </details>
+      <div class="box try">
+        <h3>動手試試</h3>
+        <ol>
+          <li>打開「抽後放回」對照，再把 N 拉到 30、S 維持比例，看兩種分配愈來愈像。</li>
+          <li>把 n 拉到和 N 一樣大：全部 PT 都排班，學生人數一定是 S，變異數變成 0。</li>
+          <li>選「X ≥ 2」，算算看排到的 3 人中，學生占多數的機率。</li>
+        </ol>
+      </div>
+      <details class="grad">
+        <summary>研究所延伸：有限母體校正因子</summary>
+        <p>超幾何的變異數比二項分配多乘上 $\frac{N-n}{N-1}$，稱為<strong>有限母體校正因子</strong>。抽樣比例 $n/N$ 愈大，這個因子愈小，代表不放回抽樣讓結果更穩定。實務上，當 $n/N<0.05$ 時，兩者差異很小，常直接用二項分配近似。</p>
+        <p class="box wash num" id="fpcTxt"></p>
+      </details>
+    </div>
 
-            <div class="pt-3 mt-auto border-t border-cyan-200 text-xs text-indigo-950 px-3 bg-cyan-100/60 p-3.5 rounded-xl">
-                <p class="font-bold text-indigo-900 mb-1"><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> 學習提示</p>
-                模組一統一採用籃球員投籃命中數，其餘模組對應各自生活與商管實例！
-            </div>
-        </nav>
+    <!-- ---------- 5 Poisson ---------- -->
+    <div class="panel" data-panel="5">
+      <h2>Poisson 分配</h2>
+      <div class="box story"><span class="tag blue">店長的問題</span>
+        <p class="sq">某家超商每星期平均收到 3 次顧客抱怨。請問四個星期內，剛好只收到 6 次（x）抱怨的機率是多少？</p>
+        <button class="btn primary" data-apply="pois">套用題目設定</button>
+      </div>
+      <div class="box selbox" data-sel></div>
+      <div class="sl-row"><span class="slab">每週平均</span><input type="range" data-d="pois" data-k="rate" min="0.5" max="10" step="0.5" aria-label="每週平均抱怨次數"><output data-o="pois-rate"></output></div>
+      <div class="sl-row"><span class="slab">觀察幾週</span><input type="range" data-d="pois" data-k="t" min="1" max="8" step="1" aria-label="觀察幾週"><output data-o="pois-t"></output></div>
+      <p class="num" id="poisLam"></p>
+      <div class="box wash"><p style="margin:0"><strong>最常見的錯誤</strong>：直接用 λ = 3。題目問的是<strong>四個星期</strong>，平均次數要跟著時間放大：λ = 3 × 4 = 12。λ 一定要和題目的時間長度一致。</p></div>
+      <h3>什麼時候用 Poisson 分配？</h3>
+      <ul class="cond">
+        <li>問的是<strong>一段時間（或空間）內</strong>，某事件發生幾次。</li>
+        <li>事件的平均發生率固定，而且彼此獨立。</li>
+        <li>次數理論上沒有上限（0、1、2、……）。</li>
+      </ul>
+      <details class="fold"><summary>公式與店長題目的計算過程</summary>
+        <p class="fx">$$P(X=x)=\frac{e^{-\lambda}\lambda^{x}}{x!},\qquad E(X)=Var(X)=\lambda$$</p>
+        <p class="box wash num">λ = 3 × 4 = 12<br>P(X = 6) = e⁻¹² × 12⁶ ÷ 6! ≈ <span class="c-coral">0.0255</span><br>若題意是「最多 6 次」：P(X ≤ 6) ≈ 0.0458</p>
+      </details>
+      <div class="box try">
+        <h3>動手試試</h3>
+        <ol>
+          <li>先停在 1 週，點 6 那根長條；再把週數拉到 4，同一個「6 次」的機率掉了多少？</li>
+          <li>λ 很小時分配往右偏；把 λ 拉大到 20 以上，形狀愈來愈對稱，像什麼分配？</li>
+          <li>看統計列：Poisson 分配的平均數和變異數永遠相等。</li>
+        </ol>
+      </div>
+      <details class="grad">
+        <summary>研究所延伸：Poisson 與二項、計數資料迴歸</summary>
+        <p>當二項分配的 $n$ 很大、$p$ 很小、$np=\lambda$ 固定時，二項分配會趨近 Poisson 分配，所以 Poisson 常用來描述「機會很多、但每次發生機率很小」的事件。</p>
+        <p>研究中的計數型依變數（例如每月客訴數）常用 Poisson 迴歸分析；若資料的變異數明顯大於平均數（<strong>過度離散</strong>），改用負二項迴歸較適合。</p>
+      </details>
+    </div>
 
-        <div class="flex-1 bg-[#CCFFFF] overflow-y-auto p-8 flex flex-col">
-            
-            <section id="module-binomial" class="module-panel flex-1 flex flex-col space-y-6 max-w-7xl mx-auto w-full">
-                <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div class="space-y-3">
-                        <h2 class="text-4xl font-black text-indigo-950 tracking-tight">二項分配 (Binomial Distribution)</h2>
-                        <p class="text-sm font-bold text-indigo-900 bg-indigo-50/80 p-3 rounded-xl border border-indigo-200">
-                            <i class="fa-solid fa-book-open mr-1"></i> 正式定義：描述在 n 次獨立且重覆的伯努利試驗中，成功次數 X 的離散型機率分配。每次試驗的成功機率 p 固定不變。
-                        </p>
-                        <p class="text-sm text-slate-700">
-                            <span class="font-bold text-slate-900"><i class="fa-solid fa-basketball text-amber-500 mr-1"></i> 實際生活例子：</span>籃球員的投籃命中數（在固定出手次數 n 中，每次獨立出手命中率皆為 p，計算總命中球數 X 的機率分佈與變異程度）。
-                        </p>
-                        <div class="inline-block bg-indigo-50 border border-indigo-200 px-5 py-2.5 rounded-2xl text-sm font-bold text-indigo-900">
-                            <span class="text-indigo-600 mr-2">機率質量函數:</span> <span id="math-binom"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1">
-                    <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col justify-between space-y-6">
-                        <div class="space-y-6">
-                            <h3 class="text-lg font-black text-indigo-950 flex items-center"><i class="fa-solid fa-sliders mr-2 text-indigo-600"></i> 參數設定</h3>
-                            <div class="bg-indigo-50/70 p-5 rounded-2xl border border-indigo-200 space-y-3">
-                                <div class="flex justify-between text-sm font-bold"><span class="text-slate-600">出手次數 n:</span><span id="binom-n-val" class="text-indigo-700 text-base">10</span></div>
-                                <input type="range" id="binom-n" min="1" max="30" step="1" value="10" class="w-full accent-indigo-600 cursor-pointer h-2" oninput="updateBinomial()">
-                            </div>
-                            <div class="bg-indigo-50/70 p-5 rounded-2xl border border-indigo-200 space-y-3">
-                                <div class="flex justify-between text-sm font-bold"><span class="text-slate-600">命中機率 p:</span><span id="binom-p-val" class="text-indigo-700 text-base">0.30</span></div>
-                                <input type="range" id="binom-p" min="0.05" max="0.95" step="0.05" value="0.30" class="w-full accent-indigo-600 cursor-pointer h-2" oninput="updateBinomial()">
-                            </div>
-                        </div>
-                        <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-inner space-y-4">
-                            <div class="text-xs text-cyan-300 font-black uppercase tracking-wider">統計量指標</div>
-                            <div class="flex justify-between text-sm border-b border-slate-800 pb-2"><span class="text-slate-400">平均數 E[X] = n * p:</span><span id="binom-mean" class="font-black text-cyan-400 text-base">3.00</span></div>
-                            <div class="flex justify-between text-sm"><span class="text-slate-400">變異數 Var(X):</span><span id="binom-var" class="font-black text-amber-300 text-base">2.10</span></div>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2 bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col">
-                        <h3 class="text-lg font-black text-indigo-950 mb-4 flex items-center"><i class="fa-solid fa-chart-bar mr-2 text-indigo-600"></i> 機率質量函數 (PMF)</h3>
-                        <div class="flex-1 relative min-h-[420px]"><canvas id="binomChart"></canvas></div>
-                    </div>
-                </div>
-            </section>
+    <!-- ---------- 6 幾何與負二項 ---------- -->
+    <div class="panel" data-panel="6">
+      <h2>幾何分配與負二項分配</h2>
+      <div class="box story"><span class="tag blue">店長的問題 A：幾何分配</span>
+        <p class="sq">店長教新進店員操作收銀機，每次練習學會的機率是 0.8（p）。某位員工直到第 3 次（x）才學會的機率是多少？</p>
+        <button class="btn primary" data-apply="nb-geo">套用題目 A</button>
+      </div>
+      <div class="box story"><span class="tag blue">店長的問題 B：負二項分配</span>
+        <p class="sq">平常早上每 10 位客人中有 2 人會買茶葉蛋（p = 0.2）。今天早上第 50 位客人，剛好是第 4 位（r）買茶葉蛋的人，機率是多少？</p>
+        <button class="btn primary" data-apply="nb-egg">套用題目 B</button>
+      </div>
+      <div class="box selbox" data-sel></div>
+      <div class="sl-row"><span class="slab">第幾次成功 r</span><input type="range" data-d="nb" data-k="r" min="1" max="10" step="1" aria-label="第 r 次成功"><output data-o="nb-r"></output></div>
+      <div class="sl-row"><span class="slab">成功率 p</span><input type="range" data-d="nb" data-k="p" min="0.05" max="0.95" step="0.01" aria-label="每次成功率 p"><output data-o="nb-p"></output></div>
+      <p class="lead" id="nbNote"></p>
+      <h3>兩者的關係</h3>
+      <ul class="cond">
+        <li>都是一次又一次獨立地試，每次成功率 p 固定。</li>
+        <li><strong>幾何分配</strong>：問「第幾次才<strong>第一次</strong>成功」。</li>
+        <li><strong>負二項分配</strong>：問「第幾次才達到<strong>第 r 次</strong>成功」。幾何分配就是 r = 1 的負二項分配。</li>
+        <li>和二項分配相反：二項固定次數、問成功幾次；負二項固定成功次數、問要試幾次。</li>
+      </ul>
+      <details class="fold"><summary>公式與店長題目的計算過程</summary>
+        <p class="fx">$$P(X=x)=\binom{x-1}{r-1}p^{r}(1-p)^{x-r},\quad x=r,r+1,\dots$$</p>
+        <p class="fx">$$E(X)=\frac{r}{p},\qquad Var(X)=\frac{r(1-p)}{p^{2}}$$</p>
+        <p class="box wash num">A（r = 1）：P(X = 3) = 0.2² × 0.8 = <span class="c-coral">0.032</span><br>B（r = 4）：P(X = 50) = C(49, 3) × 0.2⁴ × 0.8⁴⁶ ≈ <span class="c-coral">0.0010</span>；平均要到第 4 ÷ 0.2 = 20 位客人才會賣出第 4 顆。</p>
+      </details>
+      <div class="box try">
+        <h3>動手試試</h3>
+        <ol>
+          <li>套用題目 A 後，把 p 從 0.8 降到 0.3：學得慢的員工，長尾巴拉得多長？</li>
+          <li>套用題目 B，看第 50 位落在分配的哪裡。店長看到這個結果，該懷疑什麼？</li>
+          <li>把 r 從 1 慢慢拉到 10，分配的形狀怎麼從「溜滑梯」變成「小山丘」？</li>
+        </ol>
+      </div>
+      <details class="grad">
+        <summary>研究所延伸：兩種定義方式</summary>
+        <p>本頁以「試驗總次數」X 定義（X ≥ r）。也有教科書和統計軟體以「第 r 次成功之前的<strong>失敗次數</strong>」Y = X − r 定義，此時 $E(Y)=\frac{r(1-p)}{p}$。兩種定義的機率完全相同，只是橫軸平移 r。查表或使用軟體時，要先確認採用哪一種定義。</p>
+      </details>
+    </div>
 
-            <section id="module-hypergeometric" class="module-panel hidden flex-1 flex flex-col space-y-6 max-w-7xl mx-auto w-full">
-                <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div class="space-y-3">
-                        <h2 class="text-4xl font-black text-indigo-950 tracking-tight">超幾何分配 (Hypergeometric Distribution)</h2>
-                        <p class="text-sm font-bold text-purple-900 bg-purple-50/80 p-3 rounded-xl border border-purple-200">
-                            <i class="fa-solid fa-book-open mr-1"></i> 正式定義：描述從含有 N 個總數（含 K 個不良品）的有限母體中，採無放回隨機抽樣 n 件樣本時，樣本中包含 x 個不良品的離散型機率分配。
-                        </p>
-                        <p class="text-sm text-slate-700">
-                            <span class="font-bold text-slate-900"><i class="fa-solid fa-boxes-stacked text-purple-600 mr-1"></i> 實際生活例子：</span>批次品管瑕疵品抽檢（總批次 N 中包含 K 件不良品，無放回隨機抽樣 n 件，求抽到 x 件不良品的機率）。
-                        </p>
-                        <div class="inline-block bg-purple-50 border border-purple-200 px-5 py-2.5 rounded-2xl text-sm font-bold text-purple-900">
-                            <span class="text-purple-600 mr-2">機率質量函數:</span> <span id="math-hyper"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1">
-                    <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col justify-between space-y-6">
-                        <div class="space-y-5">
-                            <h3 class="text-lg font-black text-indigo-950 flex items-center"><i class="fa-solid fa-sliders mr-2 text-purple-600"></i> 參數設定</h3>
-                            <div class="bg-purple-50/70 p-5 rounded-2xl border border-purple-200 space-y-3">
-                                <div class="flex justify-between text-sm font-bold"><span class="text-slate-600">總批次 N:</span><span id="hyper-N-val" class="text-purple-700 text-base">50</span></div>
-                                <input type="range" id="hyper-N" min="20" max="100" step="5" value="50" class="w-full accent-purple-600 cursor-pointer h-2" oninput="updateHypergeometric()">
-                            </div>
-                            <div class="bg-purple-50/70 p-5 rounded-2xl border border-purple-200 space-y-3">
-                                <div class="flex justify-between text-sm font-bold"><span class="text-slate-600">不良品數 K:</span><span id="hyper-K-val" class="text-purple-700 text-base">10</span></div>
-                                <input type="range" id="hyper-K" min="1" max="30" step="1" value="10" class="w-full accent-purple-600 cursor-pointer h-2" oninput="updateHypergeometric()">
-                            </div>
-                            <div class="bg-purple-50/70 p-5 rounded-2xl border border-purple-200 space-y-3">
-                                <div class="flex justify-between text-sm font-bold"><span class="text-slate-600">抽樣數 n:</span><span id="hyper-n-val" class="text-purple-700 text-base">10</span></div>
-                                <input type="range" id="hyper-n" min="2" max="25" step="1" value="10" class="w-full accent-purple-600 cursor-pointer h-2" oninput="updateHypergeometric()">
-                            </div>
-                        </div>
-                        <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-inner space-y-4">
-                            <div class="text-xs text-cyan-300 font-black uppercase tracking-wider">統計量指標</div>
-                            <div class="flex justify-between text-sm border-b border-slate-800 pb-2"><span class="text-slate-400">平均數 E[X] = n * (K/N):</span><span id="hyper-mean" class="font-black text-cyan-400 text-base">2.00</span></div>
-                            <div class="flex justify-between text-sm"><span class="text-slate-400">變異數 Var(X):</span><span id="hyper-var" class="font-black text-amber-300 text-base">1.31</span></div>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2 bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col">
-                        <h3 class="text-lg font-black text-indigo-950 mb-4 flex items-center"><i class="fa-solid fa-chart-column mr-2 text-purple-600"></i> 超幾何機率分布</h3>
-                        <div class="flex-1 relative min-h-[420px]"><canvas id="hyperChart"></canvas></div>
-                    </div>
-                </div>
-            </section>
+    <!-- ---------- 7 均勻 ---------- -->
+    <div class="panel" data-panel="7">
+      <h2>均勻分配（Uniform）</h2>
+      <div class="box story"><span class="tag blue">店長的問題</span>
+        <p class="sq">物流車平常在 20:50～21:20 之間抵達，符合均勻分配。今天負責點貨的同事預計 21:03 下班，他有多大的機會在下班前等到送貨員？</p>
+        <button class="btn primary" data-apply="unif">套用題目設定</button>
+      </div>
+      <div class="box selbox" data-sel></div>
+      <div class="sl-row"><span class="slab">最早 a</span><input type="range" data-d="unif" data-k="a" min="40" max="70" step="1" aria-label="最早抵達時間 a"><output data-o="unif-a"></output></div>
+      <div class="sl-row"><span class="slab">最晚 b</span><input type="range" data-d="unif" data-k="b" min="50" max="90" step="1" aria-label="最晚抵達時間 b"><output data-o="unif-b"></output></div>
+      <p class="lead" style="font-size:.9em">為了讓圖看得清楚，時段至少保留 10 分鐘。</p>
+      <h3>直覺：長方形的面積</h3>
+      <p>時段內每一分鐘的可能性都一樣，所以密度是一條水平線，高度 $\frac{1}{b-a}$。任何一段時間的機率，就是那一段長方形的面積：<strong>寬度 ÷ 總寬度</strong>。</p>
+      <details class="fold"><summary>公式與店長題目的計算過程</summary>
+        <p class="fx">$$f(x)=\frac{1}{b-a},\quad a\le x\le b$$</p>
+        <p class="fx">$$E(X)=\frac{a+b}{2},\qquad Var(X)=\frac{(b-a)^{2}}{12}$$</p>
+        <p class="box wash num">總寬度：20:50～21:20，共 30 分鐘；下班前：20:50～21:03，共 13 分鐘<br>P(X &lt; 21:03) = 13 ÷ 30 ≈ <span class="c-coral">0.4333</span><br>E(X) = 21:05；標準差 = 30 ÷ √12 ≈ 8.66 分鐘</p>
+      </details>
+      <div class="box try">
+        <h3>動手試試</h3>
+        <ol>
+          <li>套用題目後，拖曳選取 21:00～21:10，機率為什麼剛好是 1/3？</li>
+          <li>同事想要至少 80% 的機會等到物流車，他最晚要等到幾點才下班？</li>
+          <li>把時段縮短成 10 分鐘：長方形變高了，但總面積還是 1。</li>
+        </ol>
+      </div>
+      <details class="grad">
+        <summary>研究所延伸：模擬研究的起點</summary>
+        <p>電腦產生的亂數大多是 0～1 的均勻分配。利用<strong>反函數轉換法</strong>，若 $U\sim U(0,1)$，則 $X=F^{-1}(U)$ 就會服從累積分配函數為 $F$ 的分配。例如 $X=-\beta\ln(1-U)$ 服從平均數為 β 的指數分配。這是蒙地卡羅模擬與拔靴法的基礎。</p>
+      </details>
+    </div>
 
-            <section id="module-geometric" class="module-panel hidden flex-1 flex flex-col space-y-6 max-w-7xl mx-auto w-full">
-                <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div class="space-y-3">
-                        <h2 class="text-4xl font-black text-indigo-950 tracking-tight">幾何分配 (Geometric Distribution)</h2>
-                        <p class="text-sm font-bold text-rose-900 bg-rose-50/80 p-3 rounded-xl border border-rose-200">
-                            <i class="fa-solid fa-book-open mr-1"></i> 正式定義：描述在獨立重複的伯努利試驗中，直到首次獲得成功為止所需要的試驗總次數 k 的離散型機率分配。
-                        </p>
-                        <p class="text-sm text-slate-700">
-                            <span class="font-bold text-slate-900"><i class="fa-solid fa-bullseye text-rose-600 mr-1"></i> 實際生活例子：</span>直到首次推銷成功次數（每次獨立推銷成功率為 p，直到第 k 次才第一次成交的機率分佈）。
-                        </p>
-                        <div class="inline-block bg-rose-50 border border-rose-200 px-5 py-2.5 rounded-2xl text-sm font-bold text-rose-900">
-                            <span class="text-rose-600 mr-2">機率質量函數:</span> <span id="math-geo"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1">
-                    <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col justify-between space-y-6">
-                        <div class="space-y-5">
-                            <h3 class="text-lg font-black text-indigo-950 flex items-center"><i class="fa-solid fa-sliders mr-2 text-rose-600"></i> 參數設定</h3>
-                            <div class="bg-rose-50/70 p-5 rounded-2xl border border-rose-200 space-y-3">
-                                <div class="flex justify-between text-sm font-bold"><span class="text-slate-600">單次成功率 p:</span><span id="geo-p-val" class="text-rose-700 text-base">20.0%</span></div>
-                                <input type="range" id="geo-p" min="5" max="80" step="1" value="20" class="w-full accent-rose-600 cursor-pointer h-2" oninput="updateGeometric()">
-                            </div>
-                        </div>
-                        <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-inner space-y-4">
-                            <div class="text-xs text-cyan-300 font-black uppercase tracking-wider">統計量指標</div>
-                            <div class="flex justify-between text-sm border-b border-slate-800 pb-2"><span class="text-slate-400">平均數 E[X] = 1 / p:</span><span id="geo-mean" class="font-black text-cyan-400 text-base">5.0 次</span></div>
-                            <div class="flex justify-between text-sm"><span class="text-slate-400">變異數 Var(X):</span><span id="geo-var" class="font-black text-amber-300 text-base">20.0</span></div>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2 bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col">
-                        <h3 class="text-lg font-black text-indigo-950 mb-4 flex items-center"><i class="fa-solid fa-chart-line mr-2 text-rose-600"></i> 幾何機率分佈圖</h3>
-                        <div class="flex-1 relative min-h-[420px]"><canvas id="geoChart"></canvas></div>
-                    </div>
-                </div>
-            </section>
+    <!-- ---------- 8 常態 ---------- -->
+    <div class="panel" data-panel="8">
+      <h2>常態分配（Normal）</h2>
+      <div class="box story"><span class="tag blue">店長的問題</span>
+        <p class="sq">某間超商每日營業額平均 10 萬元，標準差 1 萬元。某日營業額低於 8 萬 5 千元的機率是多少？</p>
+        <button class="btn primary" data-apply="norm">套用題目設定</button>
+      </div>
+      <div class="box selbox" data-sel></div>
+      <div class="sl-row"><span class="slab">平均數 μ</span><input type="range" data-d="norm" data-k="mu" min="7" max="13" step="0.1" aria-label="平均數 μ"><output data-o="norm-mu"></output></div>
+      <div class="sl-row"><span class="slab">標準差 σ</span><input type="range" data-d="norm" data-k="sd" min="0.6" max="2.5" step="0.1" aria-label="標準差 σ"><output data-o="norm-sd"></output></div>
+      <label class="chk"><input type="checkbox" id="normBands"> 顯示 68–95–99.7 法則的區間</label>
+      <h3>標準化：換算成 z 值</h3>
+      <p>橫軸下方的紫色刻度是 z 值，表示「離平均數幾個標準差」：$z=\frac{x-\mu}{\sigma}$。不管 μ、σ 是多少，同一個 z 值左邊的面積都一樣。</p>
+      <p class="box wash num" id="normZ"></p>
+      <details class="fold"><summary>公式與店長題目的計算過程</summary>
+        <p class="fx">$$f(x)=\frac{1}{\sigma\sqrt{2\pi}}\,e^{-\frac{(x-\mu)^{2}}{2\sigma^{2}}}$$</p>
+        <p class="box wash num">z = (8.5 − 10) ÷ 1 = −1.5<br>P(X &lt; 8.5) = P(Z &lt; −1.5) ≈ <span class="c-coral">0.0668</span><br>大約每 15 天會有 1 天營業額低於 8.5 萬元。</p>
+      </details>
+      <div class="box try">
+        <h3>動手試試</h3>
+        <ol>
+          <li>只拉 μ：整座山左右平移，形狀不變。</li>
+          <li>只拉 σ：σ 變大，山變矮、變寬，但面積還是 1。選取同一段區間，機率怎麼變？</li>
+          <li>打開 68–95–99.7 法則，拖曳選取 μ ± 1σ，確認機率約為 0.68。</li>
+        </ol>
+      </div>
+      <details class="grad">
+        <summary>研究所延伸：為什麼常態分配這麼常見？</summary>
+        <p>依<strong>中央極限定理</strong>，許多獨立因素加總或平均的結果會趨近常態分配，例如每日營業額是數百筆交易金額的加總。但個別交易金額、等候時間、所得等變數常呈右偏，不一定是常態。進行參數檢定前，應以直方圖、Q-Q 圖或偏態、峰態係數檢查分配形狀。</p>
+      </details>
+    </div>
 
-            <section id="module-poisson" class="module-panel hidden flex-1 flex flex-col space-y-6 max-w-7xl mx-auto w-full">
-                <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div class="space-y-3">
-                        <h2 class="text-4xl font-black text-indigo-950 tracking-tight">卜瓦松分配 (Poisson Distribution)</h2>
-                        <p class="text-sm font-bold text-emerald-900 bg-emerald-50/80 p-3 rounded-xl border border-emerald-200">
-                            <i class="fa-solid fa-book-open mr-1"></i> 正式定義：描述在固定時間區間或空間範圍內，稀有事件平均以固定強度 λ 獨立發生的次數 k 的離散型機率分配。
-                        </p>
-                        <p class="text-sm text-slate-700">
-                            <span class="font-bold text-slate-900"><i class="fa-solid fa-server text-emerald-600 mr-1"></i> 實際生活例子：</span>客服中心單位時間來電數（在固定時間區間內平均來電數 λ 的機率分佈）。
-                        </p>
-                        <div class="inline-block bg-emerald-50 border border-emerald-200 px-5 py-2.5 rounded-2xl text-sm font-bold text-emerald-900">
-                            <span class="text-emerald-600 mr-2">機率質量函數:</span> <span id="math-pois"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1">
-                    <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col justify-between space-y-6">
-                        <div class="space-y-5">
-                            <h3 class="text-lg font-black text-indigo-950 flex items-center"><i class="fa-solid fa-sliders mr-2 text-emerald-600"></i> 參數設定</h3>
-                            <div class="bg-emerald-50/70 p-5 rounded-2xl border border-emerald-200 space-y-3">
-                                <div class="flex justify-between text-sm font-bold"><span class="text-slate-600">平均到達率 λ:</span><span id="pois-lambda-val" class="text-emerald-700 text-base">4.0</span></div>
-                                <input type="range" id="pois-lambda" min="0.5" max="15" step="0.5" value="4.0" class="w-full accent-emerald-600 cursor-pointer h-2" oninput="updatePoisson()">
-                            </div>
-                        </div>
-                        <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-inner space-y-4">
-                            <div class="text-xs text-cyan-300 font-black uppercase tracking-wider">統計量指標</div>
-                            <div class="flex justify-between text-sm border-b border-slate-800 pb-2"><span class="text-slate-400">平均數 E[X] = λ:</span><span id="pois-mean" class="font-black text-cyan-400 text-base">4.00</span></div>
-                            <div class="flex justify-between text-sm"><span class="text-slate-400">變異數 Var(X):</span><span id="pois-var" class="font-black text-amber-300 text-base">4.00</span></div>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2 bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col">
-                        <h3 class="text-lg font-black text-indigo-950 mb-4 flex items-center"><i class="fa-solid fa-chart-column mr-2 text-emerald-600"></i> 卜瓦松分佈 PMF</h3>
-                        <div class="flex-1 relative min-h-[420px]"><canvas id="poisChart"></canvas></div>
-                    </div>
-                </div>
-            </section>
+    <!-- ---------- 9 指數 ---------- -->
+    <div class="panel" data-panel="9">
+      <h2>指數分配（Exponential）</h2>
+      <div class="box story"><span class="tag blue">店長的問題</span>
+        <p class="sq">客人平均每隔 2 分鐘來 1 位。等了 5 分鐘都完全沒有客人的機率是多少？</p>
+        <button class="btn primary" data-apply="exp">套用題目設定</button>
+      </div>
+      <div class="box selbox" data-sel></div>
+      <div class="sl-row"><span class="slab">平均間隔 β</span><input type="range" data-d="exp" data-k="beta" min="1" max="5" step="0.1" aria-label="平均間隔 β 分鐘"><output data-o="exp-beta"></output></div>
+      <p class="num" id="expLam"></p>
+      <h3>什麼時候用指數分配？</h3>
+      <ul class="cond">
+        <li>問的是「<strong>還要等多久</strong>」下一個事件才發生。</li>
+        <li>事件以固定的平均速率隨機發生（和 Poisson 是同一件事的兩面）。</li>
+        <li>右尾機率很好算：$P(X>x)=e^{-x/\beta}$。</li>
+      </ul>
+      <h3>無記憶性</h3>
+      <div class="sl-row"><span class="slab">已經等了 s</span><input type="range" id="memS" min="0" max="10" step="0.5" value="5" aria-label="已經等了 s 分鐘"><output id="memSo"></output></div>
+      <div class="sl-row"><span class="slab">再等 t</span><input type="range" id="memT" min="0.5" max="10" step="0.5" value="2" aria-label="再等 t 分鐘"><output id="memTo"></output></div>
+      <p class="box wash num" id="memTxt"></p>
+      <details class="fold"><summary>公式與店長題目的計算過程</summary>
+        <p class="fx">$$f(x)=\frac{1}{\beta}e^{-x/\beta},\quad x\ge0;\qquad \lambda=\frac{1}{\beta}$$</p>
+        <p class="fx">$$E(X)=\beta,\qquad Var(X)=\beta^{2}$$</p>
+        <p class="box wash num">β = 2 分鐘（λ = 0.5 位／分鐘）<br>P(X &gt; 5) = e^(−5/2) = e^(−2.5) ≈ <span class="c-coral">0.0821</span></p>
+      </details>
+      <div class="box try">
+        <h3>動手試試</h3>
+        <ol>
+          <li>套用題目後，把 β 拉到 4（客人變少），等 5 分鐘都沒人的機率變成多少？</li>
+          <li>拖曳選取 0～2 分鐘：等待時間不到平均值的機率，為什麼超過一半？</li>
+          <li>用「無記憶性」滑桿驗證：已經等了多久，對「再等 t 分鐘」完全沒有影響。</li>
+        </ol>
+      </div>
+      <details class="grad">
+        <summary>研究所延伸：指數分配與 Poisson 分配</summary>
+        <p>若每分鐘到店人數服從 Poisson(λ)，則相鄰兩位客人的間隔時間服從平均數 1/λ 的指數分配。「t 分鐘內沒有客人」在 Poisson 的角度是 $P(N_t=0)=e^{-\lambda t}$，在指數的角度是 $P(X>t)=e^{-\lambda t}$，兩者相同。這是排隊理論的 M/M/1 模型基礎；存活分析中，指數分配代表風險率固定不變。</p>
+      </details>
+    </div>
 
-            <section id="module-negative_binomial" class="module-panel hidden flex-1 flex flex-col space-y-6 max-w-7xl mx-auto w-full">
-                <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div class="space-y-3">
-                        <h2 class="text-4xl font-black text-indigo-950 tracking-tight">負二項分配 (Negative Binomial Distribution)</h2>
-                        <p class="text-sm font-bold text-amber-900 bg-amber-50/80 p-3 rounded-xl border border-amber-200">
-                            <i class="fa-solid fa-book-open mr-1"></i> 正式定義：描述在獨立重複試驗中，為了達到指定成功次數 r 而必須進行的總試驗次數 x 的離散型機率分配。
-                        </p>
-                        <p class="text-sm text-slate-700">
-                            <span class="font-bold text-slate-900"><i class="fa-solid fa-trophy text-amber-500 mr-1"></i> 實際生活例子：</span>達成第 r 筆訂單所需的總拜訪數（每次拜訪成交機率為 p，當達成第 r 筆成交時，總拜訪次數 x 的機率分佈）。
-                        </p>
-                        <div class="inline-block bg-amber-50 border border-amber-200 px-5 py-2.5 rounded-2xl text-sm font-bold text-amber-900">
-                            <span class="text-amber-600 mr-2">機率質量函數:</span> <span id="math-neg"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1">
-                    <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col justify-between space-y-6">
-                        <div class="space-y-5">
-                            <h3 class="text-lg font-black text-indigo-950 flex items-center"><i class="fa-solid fa-sliders mr-2 text-amber-600"></i> 參數設定</h3>
-                            <div class="bg-amber-50/70 p-5 rounded-2xl border border-amber-200 space-y-3">
-                                <div class="flex justify-between text-sm font-bold"><span class="text-slate-600">目標成功數 r:</span><span id="neg-r-val" class="text-amber-800 text-base">3</span></div>
-                                <input type="range" id="neg-r" min="1" max="10" step="1" value="3" class="w-full accent-amber-600 cursor-pointer h-2" oninput="updateNegBinom()">
-                            </div>
-                            <div class="bg-amber-50/70 p-5 rounded-2xl border border-amber-200 space-y-3">
-                                <div class="flex justify-between text-sm font-bold"><span class="text-slate-600">單次成功率 p:</span><span id="neg-p-val" class="text-amber-800 text-base">0.30</span></div>
-                                <input type="range" id="neg-p" min="0.1" max="0.9" step="0.05" value="0.30" class="w-full accent-amber-600 cursor-pointer h-2" oninput="updateNegBinom()">
-                            </div>
-                        </div>
-                        <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-inner space-y-4">
-                            <div class="text-xs text-cyan-300 font-black uppercase tracking-wider">統計量指標</div>
-                            <div class="flex justify-between text-sm border-b border-slate-800 pb-2"><span class="text-slate-400">平均數 E[X] = r / p:</span><span id="neg-mean" class="font-black text-cyan-400 text-base">10.0</span></div>
-                            <div class="flex justify-between text-sm"><span class="text-slate-400">變異數 Var(X):</span><span id="neg-var" class="font-black text-amber-300 text-base">23.3</span></div>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2 bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col">
-                        <h3 class="text-lg font-black text-indigo-950 mb-4 flex items-center"><i class="fa-solid fa-chart-bar mr-2 text-amber-600"></i> 負二項機率分佈</h3>
-                        <div class="flex-1 relative min-h-[420px]"><canvas id="negChart"></canvas></div>
-                    </div>
-                </div>
-            </section>
+    <!-- ---------- 10 自我檢測 ---------- -->
+    <div class="panel quiz" data-panel="10">
+      <h2>自我檢測</h2>
+      <p class="lead">選一個答案，馬上就會看到解析。第 1、2、4 題最多人選錯，錯了也沒關係，看解析就好。</p>
+      <div id="quizBox"></div>
+      <div class="qfoot"><p class="score" id="score"></p><button class="btn" id="quizReset">重新作答</button></div>
+    </div>
+  </section>
+</main>
 
-            <section id="module-uniform" class="module-panel hidden flex-1 flex flex-col space-y-6 max-w-7xl mx-auto w-full">
-                <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div class="space-y-3">
-                        <h2 class="text-4xl font-black text-indigo-950 tracking-tight">連續均勻分配 (Continuous Uniform Distribution)</h2>
-                        <p class="text-sm font-bold text-cyan-900 bg-cyan-50/80 p-3 rounded-xl border border-cyan-200">
-                            <i class="fa-solid fa-book-open mr-1"></i> 正式定義：描述在指定區間 [a, b] 內，連續型隨機變數 X 落在任何等長子區間內的機率皆完全相等的機率分配。
-                        </p>
-                        <p class="text-sm text-slate-700">
-                            <span class="font-bold text-slate-900"><i class="fa-solid fa-arrows-split-up-and-left text-cyan-600 mr-1"></i> 實際生活例子：</span>公車班次隨機等候時間（在發車間隔區間 [a, b] 內，乘客隨機到達的等候時間機率密度完全相同）。
-                        </p>
-                        <div class="inline-block bg-cyan-50 border border-cyan-200 px-5 py-2.5 rounded-2xl text-sm font-bold text-cyan-900">
-                            <span class="text-cyan-600 mr-2">機率密度函數:</span> <span id="math-uni"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1">
-                    <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col justify-between space-y-6">
-                        <div class="space-y-5">
-                            <h3 class="text-lg font-black text-indigo-950 flex items-center"><i class="fa-solid fa-sliders mr-2 text-cyan-600"></i> 參數設定</h3>
-                            <div class="bg-cyan-50/70 p-5 rounded-2xl border border-cyan-200 space-y-3">
-                                <div class="flex justify-between text-sm font-bold"><span class="text-slate-600">下限 a (分鐘):</span><span id="uni-a-val" class="text-cyan-800 text-base">0</span></div>
-                                <input type="range" id="uni-a" min="0" max="10" step="1" value="0" class="w-full accent-cyan-600 cursor-pointer h-2" oninput="updateUniform()">
-                            </div>
-                            <div class="bg-cyan-50/70 p-5 rounded-2xl border border-cyan-200 space-y-3">
-                                <div class="flex justify-between text-sm font-bold"><span class="text-slate-600">上限 b (分鐘):</span><span id="uni-b-val" class="text-cyan-800 text-base">20</span></div>
-                                <input type="range" id="uni-b" min="12" max="30" step="1" value="20" class="w-full accent-cyan-600 cursor-pointer h-2" oninput="updateUniform()">
-                            </div>
-                        </div>
-                        <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-inner space-y-4">
-                            <div class="text-xs text-cyan-300 font-black uppercase tracking-wider">統計量指標</div>
-                            <div class="flex justify-between text-sm border-b border-slate-800 pb-2"><span class="text-slate-400">平均數 E[X] = (a+b) / 2:</span><span id="uni-mean" class="font-black text-cyan-400 text-base">10.0</span></div>
-                            <div class="flex justify-between text-sm"><span class="text-slate-400">變異數 Var(X):</span><span id="uni-var" class="font-black text-amber-300 text-base">33.3</span></div>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2 bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col">
-                        <h3 class="text-lg font-black text-indigo-950 mb-4 flex items-center"><i class="fa-solid fa-chart-area mr-2 text-cyan-600"></i> 機率密度函數 (PDF)</h3>
-                        <div class="flex-1 relative min-h-[420px]"><canvas id="uniChart"></canvas></div>
-                    </div>
-                </div>
-            </section>
+<footer>教學用虛構情境與數字，僅供課堂示範。</footer>
+</div>
 
-            <section id="module-normal" class="module-panel hidden flex-1 flex flex-col space-y-6 max-w-7xl mx-auto w-full">
-                <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div class="space-y-3">
-                        <h2 class="text-4xl font-black text-indigo-950 tracking-tight">常態分配 (Normal Distribution)</h2>
-                        <p class="text-sm font-bold text-indigo-900 bg-indigo-50/80 p-3 rounded-xl border border-indigo-200">
-                            <i class="fa-solid fa-book-open mr-1"></i> 正式定義：又稱高斯分配，是一種對稱的鐘形曲線連續型機率分配，由平均數 μ 與標準差 σ 完全決定。
-                        </p>
-                        <p class="text-sm text-slate-700">
-                            <span class="font-bold text-slate-900"><i class="fa-solid fa-ruler text-indigo-600 mr-1"></i> 實際生活例子：</span>員工年度績效考核分數（平均績效分數 μ 與標準差 σ 決定鐘形曲線的分佈）。
-                        </p>
-                        <div class="inline-block bg-indigo-50 border border-indigo-200 px-5 py-2.5 rounded-2xl text-sm font-bold text-indigo-900">
-                            <span class="text-indigo-600 mr-2">機率密度函數:</span> <span id="math-norm"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1">
-                    <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col justify-between space-y-6">
-                        <div class="space-y-5">
-                            <h3 class="text-lg font-black text-indigo-950 flex items-center"><i class="fa-solid fa-sliders mr-2 text-indigo-600"></i> 參數設定</h3>
-                            <div class="bg-indigo-50/70 p-5 rounded-2xl border border-indigo-200 space-y-3">
-                                <div class="flex justify-between text-sm font-bold"><span class="text-slate-600">平均分數 μ:</span><span id="norm-mean-val" class="text-indigo-800 text-base">75.0 分</span></div>
-                                <input type="range" id="norm-mean" min="60" max="90" step="1" value="75" class="w-full accent-indigo-600 cursor-pointer h-2" oninput="updateNormal()">
-                            </div>
-                            <div class="bg-indigo-50/70 p-5 rounded-2xl border border-indigo-200 space-y-3">
-                                <div class="flex justify-between text-sm font-bold"><span class="text-slate-600">標準差 σ:</span><span id="norm-sd-val" class="text-indigo-800 text-base">8.0 分</span></div>
-                                <input type="range" id="norm-sd" min="2.0" max="15.0" step="0.5" value="8.0" class="w-full accent-indigo-600 cursor-pointer h-2" oninput="updateNormal()">
-                            </div>
-                        </div>
-                        <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-inner space-y-4">
-                            <div class="text-xs text-cyan-300 font-black uppercase tracking-wider">統計量指標</div>
-                            <div class="flex justify-between text-sm border-b border-slate-800 pb-2"><span class="text-slate-400">平均數 E[X] = μ:</span><span id="norm-mean-stat" class="font-black text-cyan-400 text-base">75.00</span></div>
-                            <div class="flex justify-between text-sm"><span class="text-slate-400">變異數 Var(X):</span><span id="norm-var" class="font-black text-amber-300 text-base">64.00</span></div>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2 bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col">
-                        <h3 class="text-lg font-black text-indigo-950 mb-4 flex items-center"><i class="fa-solid fa-chart-area mr-2 text-indigo-600"></i> 機率密度函數 (PDF)</h3>
-                        <div class="flex-1 relative min-h-[420px]"><canvas id="normChart"></canvas></div>
-                    </div>
-                </div>
-            </section>
+<script>
+(() => {
+"use strict";
+const $=id=>document.getElementById(id);
 
-            <section id="module-exponential" class="module-panel hidden flex-1 flex flex-col space-y-6 max-w-7xl mx-auto w-full">
-                <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div class="space-y-3">
-                        <h2 class="text-4xl font-black text-indigo-950 tracking-tight">指數分配 (Exponential Distribution)</h2>
-                        <p class="text-sm font-bold text-teal-900 bg-teal-50/80 p-3 rounded-xl border border-teal-200">
-                            <i class="fa-solid fa-book-open mr-1"></i> 正式定義：描述事件以固定平均發生率 λ 連續發生時，兩次相鄰事件之間的時間間隔 X 的連續型機率分配。
-                        </p>
-                        <p class="text-sm text-slate-700">
-                            <span class="font-bold text-slate-900"><i class="fa-solid fa-clock-rotate-left text-teal-600 mr-1"></i> 實際生活例子：</span>機器設備故障間隔時間（設備平均故障發生率為 λ，兩次故障之間的時間間隔機率分佈）。
-                        </p>
-                        <div class="inline-block bg-teal-50 border border-teal-200 px-5 py-2.5 rounded-2xl text-sm font-bold text-teal-900">
-                            <span class="text-teal-600 mr-2">機率密度函數:</span> <span id="math-exp"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1">
-                    <div class="bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col justify-between space-y-6">
-                        <div class="space-y-5">
-                            <h3 class="text-lg font-black text-indigo-950 flex items-center"><i class="fa-solid fa-sliders mr-2 text-teal-600"></i> 參數設定</h3>
-                            <div class="bg-teal-50/70 p-5 rounded-2xl border border-teal-200 space-y-3">
-                                <div class="flex justify-between text-sm font-bold"><span class="text-slate-600">故障率參數 λ:</span><span id="exp-lambda-val" class="text-teal-800 text-base">0.5</span></div>
-                                <input type="range" id="exp-lambda" min="0.1" max="2.0" step="0.1" value="0.5" class="w-full accent-teal-600 cursor-pointer h-2" oninput="updateExponential()">
-                            </div>
-                        </div>
-                        <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-inner space-y-4">
-                            <div class="text-xs text-cyan-300 font-black uppercase tracking-wider">統計量指標</div>
-                            <div class="flex justify-between text-sm border-b border-slate-800 pb-2"><span class="text-slate-400">平均數 E[X] = 1 / λ:</span><span id="exp-mean" class="font-black text-cyan-400 text-base">2.0 個月</span></div>
-                            <div class="flex justify-between text-sm"><span class="text-slate-400">變異數 Var(X):</span><span id="exp-var" class="font-black text-amber-300 text-base">4.00</span></div>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2 bg-white border-2 border-indigo-200 p-8 rounded-3xl shadow-xl flex flex-col">
-                        <h3 class="text-lg font-black text-indigo-950 mb-4 flex items-center"><i class="fa-solid fa-chart-line mr-2 text-teal-600"></i> 指數分配 PDF</h3>
-                        <div class="flex-1 relative min-h-[420px]"><canvas id="expChart"></canvas></div>
-                    </div>
-                </div>
-            </section>
+/* ================= 統計函數 ================= */
+function lgamma(z){
+  const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  if(z<0.5) return Math.log(Math.PI/Math.abs(Math.sin(Math.PI*z)))-lgamma(1-z);
+  z-=1;let x=c[0];for(let i=1;i<g+2;i++)x+=c[i]/(z+i);
+  const t=z+g+0.5;return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);
+}
+const lchoose=(n,k)=>lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);
+function gser(a,x){let sum=1/a,del=sum,ap=a;for(let i=0;i<500;i++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-16)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1e300,d=1/b,h=d;for(let i=1;i<500;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-16)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaP(a,x){if(x<=0)return 0;return x<a+1?gser(a,x):1-gcf(a,x);}
+function Phi(z){const x=z/Math.SQRT2;if(x>=0)return 0.5*(1+gammaP(.5,x*x));const q=x*x;return 0.5*(q<1.5?1-gammaP(.5,q):gcf(.5,q));}
+const npdf=(x,m,s)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+const binomPmf=(k,n,p)=>(k<0||k>n||k%1)?0:Math.exp(lchoose(n,k)+(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0));
 
-        </div>
-    </main>
+/* ================= 格式 ================= */
+const fmt=(v,d=2)=>Number.isFinite(v)?v.toLocaleString('zh-TW',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
+const fp=p=>p<0.00005&&p>0?'< 0.0001':p.toFixed(4);
+const pct=p=>(p*100).toFixed(p<0.001?3:p<0.1?2:1)+'%';
+const pad2=v=>String(v).padStart(2,'0');
+const clock=m=>{const t=Math.round(m),h=20+Math.floor(t/60);return `${h}:${pad2(((t%60)+60)%60)}`;};
 
-    <script>
-        // --- HELPER MATH FUNCTIONS ---
-        function factorial(n) {
-            if (n < 0) return 0;
-            if (n === 0 || n === 1) return 1;
-            let res = 1;
-            for (let i = 2; i <= n; i++) res *= i;
-            return res;
-        }
+/* ================= 分配定義 ================= */
+const D={
+  demoD:{type:'d',st:{n:20,p:0.2},sup:s=>[0,s.n],pmf:(k,s)=>binomPmf(k,s.n,s.p),mean:s=>s.n*s.p,vr:s=>s.n*s.p*(1-s.p),
+    xlab:()=>'20 位客人中的中獎人數 x（人）',unit:'人',sel:null},
+  demoC:{type:'c',st:{mu:10,sd:1},pdf:(x,s)=>npdf(x,s.mu,s.sd),cdf:(x,s)=>Phi((x-s.mu)/s.sd),mean:s=>s.mu,vr:s=>s.sd*s.sd,
+    fixed:{x0:6,x1:14,sx:1,y1:0.5,sy:0.1},step:0.05,xlab:()=>'每日營業額 x（萬元）',unit:'萬元',fx:v=>fmt(v,2),sel:[9.5,10.5]},
+  binom:{type:'d',st:{n:20,p:0.2},sup:s=>[0,s.n],pmf:(k,s)=>binomPmf(k,s.n,s.p),mean:s=>s.n*s.p,vr:s=>s.n*s.p*(1-s.p),
+    xlab:s=>`${s.n} 位客人中的中獎人數 x（人）`,unit:'人',sel:null,
+    story:{binom:{st:{n:20,p:0.2},sel:[6,6]}}},
+  hyper:{type:'d',st:{N:8,S:5,n:3},sup:s=>[Math.max(0,s.n-(s.N-s.S)),Math.min(s.n,s.S)],
+    pmf:(k,s)=>{const[a,b]=D.hyper.sup(s);return(k<a||k>b)?0:Math.exp(lchoose(s.S,k)+lchoose(s.N-s.S,s.n-k)-lchoose(s.N,s.n));},
+    mean:s=>s.n*s.S/s.N,vr:s=>s.N>1?s.n*(s.S/s.N)*(1-s.S/s.N)*(s.N-s.n)/(s.N-1):0,
+    xlab:s=>`排班的 ${s.n} 位 PT 中，學生人數 x（人）`,unit:'人',sel:null,minK:0,
+    story:{hyper:{st:{N:8,S:5,n:3},sel:[2,2]}}},
+  pois:{type:'d',st:{rate:3,t:1},lam:s=>s.rate*s.t,sup:s=>[0,Infinity],pmf:(k,s)=>{const l=s.rate*s.t;return k<0?0:Math.exp(k*Math.log(l)-l-lgamma(k+1));},
+    mean:s=>s.rate*s.t,vr:s=>s.rate*s.t,xlab:s=>`${s.t} 週內收到的抱怨次數 x（次）`,unit:'次',sel:null,
+    story:{pois:{st:{rate:3,t:4},sel:[6,6]}}},
+  nb:{type:'d',st:{r:1,p:0.8,story:'geo'},sup:s=>[s.r,Infinity],pmf:(x,s)=>x<s.r?0:Math.exp(lchoose(x-1,s.r-1)+s.r*Math.log(s.p)+(x-s.r?(x-s.r)*Math.log(1-s.p):0)),
+    mean:s=>s.r/s.p,vr:s=>s.r*(1-s.p)/(s.p*s.p),
+    xlab:s=>s.story==='egg'?`第幾位客人時，賣出第 ${s.r} 顆茶葉蛋 x（位）`:(s.r===1?'第幾次練習才第一次學會 x（次）':`第幾次才達到第 ${s.r} 次成功 x（次）`),
+    unit:'',sel:null,
+    story:{'nb-geo':{st:{r:1,p:0.8,story:'geo'},sel:[3,3]},'nb-egg':{st:{r:4,p:0.2,story:'egg'},sel:[50,50]}}},
+  unif:{type:'c',st:{a:50,b:80},pdf:(x,s)=>(x>=s.a&&x<=s.b)?1/(s.b-s.a):0,cdf:(x,s)=>x<=s.a?0:x>=s.b?1:(x-s.a)/(s.b-s.a),
+    brk:s=>[s.a-1e-7,s.a,s.b,s.b+1e-7],mean:s=>(s.a+s.b)/2,vr:s=>(s.b-s.a)**2/12,
+    fixed:{x0:40,x1:90,sx:10,y1:0.12,sy:0.02},step:1,xlab:()=>'物流車抵達時間 x',unit:'',fx:clock,meanFx:clock,sel:null,
+    story:{unif:{st:{a:50,b:80},sel:[-Infinity,63]}}},
+  norm:{type:'c',st:{mu:10,sd:1},pdf:(x,s)=>npdf(x,s.mu,s.sd),cdf:(x,s)=>Phi((x-s.mu)/s.sd),mean:s=>s.mu,vr:s=>s.sd*s.sd,
+    fixed:{x0:2,x1:18,sx:2,y1:0.75,sy:0.1},step:0.1,xlab:()=>'每日營業額 x（萬元）',unit:'萬元',fx:v=>fmt(v,1),tfx:v=>String(v),sel:null,zrow:true,
+    story:{norm:{st:{mu:10,sd:1},sel:[-Infinity,8.5]}}},
+  exp:{type:'c',st:{beta:2},pdf:(x,s)=>x<0?0:Math.exp(-x/s.beta)/s.beta,cdf:(x,s)=>x<=0?0:1-Math.exp(-x/s.beta),mean:s=>s.beta,vr:s=>s.beta*s.beta,
+    fixed:{x0:0,x1:15,sx:1,y1:1.1,sy:0.2},step:0.1,xlab:()=>'距離下一位客人的等待時間 x（分鐘）',unit:'分鐘',fx:v=>fmt(v,1),tfx:v=>String(v),sel:null,
+    story:{exp:{st:{beta:2},sel:[5,Infinity]}}}
+};
+const TABKEY={2:null,3:'binom',4:'hyper',5:'pois',6:'nb',7:'unif',8:'norm',9:'exp'};
+const st={tab:1,demo:'demoD'};
+const curKey=()=>st.tab===2?st.demo:TABKEY[st.tab]||null;
 
-        function combination(n, k) {
-            if (k < 0 || k > n) return 0;
-            return factorial(n) / (factorial(k) * factorial(n - k));
-        }
+/* 間斷型：累積機率與所需範圍 */
+function cdfD(dd,k){const s=dd.st,[a,b]=dd.sup(s);if(k<a)return 0;if(k>=b)return 1;let F=0;for(let j=a;j<=k;j++)F+=dd.pmf(j,s);return Math.min(1,F);}
+function needD(dd){
+  const s=dd.st,[a,b]=dd.sup(s);let F=0,lo=null,hi=a,mx=0;
+  for(let k=a;k<=Math.min(b,a+3000);k++){const p=dd.pmf(k,s);mx=Math.max(mx,p);F+=p;if(lo===null&&F>=0.0005)lo=k;hi=k;if(F>=0.9995)break;}
+  lo=lo??a;if(lo-a<=2)lo=a;
+  return {lo,hi:Math.max(hi,lo+4),mx};
+}
+const niceStep=v=>{const e=Math.pow(10,Math.floor(Math.log10(v)));return [1,2,2.5,5,10].map(k=>k*e).find(k=>v/k<=6);};
+function ensureDomD(dd,force){
+  const n=needD(dd),c=dd.dom;
+  const ok=!force&&c&&n.lo>=c.k0&&n.hi<=c.k1&&(n.hi-n.lo)>=0.45*(c.k1-c.k0)&&n.mx<=c.y1/1.2&&n.mx>=c.y1*0.3;
+  if(ok)return;
+  const k0=n.lo,span0=n.hi-n.lo,k1=n.hi+Math.ceil(span0*0.06);
+  const span=k1-k0,sx=span<=24?1:span<=45?2:span<=110?5:10;
+  const y1r=n.mx*1.38,sy=[0.005,0.01,0.02,0.025,0.05,0.1,0.2,0.25].find(v=>y1r/v<=6)||0.25;
+  dd.dom={k0,k1,x0:k0-0.6,x1:k1+0.6,sx,y1:Math.ceil(y1r/sy-1e-9)*sy,sy};
+}
+function selProb(dd){
+  if(!dd.sel)return null;const[lo,hi]=dd.sel,s=dd.st;
+  if(dd.type==='d'){const F=k=>cdfD(dd,k);return Math.max(0,(hi===Infinity?1:F(hi))-(lo===-Infinity?0:F(lo-1)));}
+  if(lo===hi)return 0;
+  return Math.max(0,(hi===Infinity?1:dd.cdf(hi,s))-(lo===-Infinity?0:dd.cdf(lo,s)));
+}
+function selText(dd){
+  if(!dd.sel)return '';const[lo,hi]=dd.sel,f=dd.fx||(v=>String(v));
+  if(dd.type==='d'){
+    if(lo===-Infinity)return `P(X ≤ ${hi})`;if(hi===Infinity)return `P(X ≥ ${lo})`;
+    return lo===hi?`P(X = ${lo})`:`P(${lo} ≤ X ≤ ${hi})`;}
+  if(lo===-Infinity)return `P(X < ${f(hi)})`;if(hi===Infinity)return `P(X > ${f(lo)})`;
+  return lo===hi?`P(X = ${f(lo)})`:`P(${f(lo)} < X < ${f(hi)})`;
+}
 
-        // --- RENDER KATEX FORMULAS ---
-        function renderKaTeXFormulas() {
-            try {
-                katex.render("P(X = k) = \\binom{n}{k} p^k (1 - p)^{n - k}", document.getElementById('math-binom'), { displayMode: false });
-                katex.render("P(X = x) = \\frac{\\binom{K}{x} \\binom{N - K}{n - x}}{\\binom{N}{n}}", document.getElementById('math-hyper'), { displayMode: false });
-                katex.render("P(X = k) = (1 - p)^{k - 1} p", document.getElementById('math-geo'), { displayMode: false });
-                katex.render("P(X = k) = \\frac{e^{-\\lambda} \\lambda^k}{k!}", document.getElementById('math-pois'), { displayMode: false });
-                katex.render("P(X = x) = \\binom{x - 1}{r - 1} p^r (1 - p)^{x - r}", document.getElementById('math-neg'), { displayMode: false });
-                katex.render("f(x) = \\frac{1}{b - a} \\quad (a \\le x \\le b)", document.getElementById('math-uni'), { displayMode: false });
-                katex.render("f(x) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x - \\mu)^2}{2\\sigma^2}\\right)", document.getElementById('math-norm'), { displayMode: false });
-                katex.render("f(x) = \\lambda e^{-\\lambda x} \\quad (x \\ge 0)", document.getElementById('math-exp'), { displayMode: false });
-            } catch (e) {
-                console.error("KaTeX rendering error:", e);
-            }
-        }
+/* ================= 繪圖 ================= */
+let W=680,H=450;const svg=$('chart'),layer=$('layer');
+let V=null; // 目前座標系統
+function makeView(dd){
+  const d=dd.type==='d'?dd.dom:dd.fixed,M={l:74,r:22,t:30,b:dd.zrow?92:66};
+  const X=v=>M.l+(v-d.x0)/(d.x1-d.x0)*(W-M.l-M.r),Y=v=>H-M.b-v/d.y1*(H-M.t-M.b);
+  const iX=px=>d.x0+(px-M.l)/(W-M.l-M.r)*(d.x1-d.x0);
+  return {d,M,X,Y,iX};
+}
+function render(){
+  const key=curKey();
+  if(!key){layer.innerHTML='';updateSide();return;}
+  const dd=D[key],s=dd.st;
+  const mob=!document.body.classList.contains('stage')&&window.innerWidth<900;W=mob?470:680;H=mob?430:450;svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  if(dd.type==='d')ensureDomD(dd);
+  V=makeView(dd);const {d,M,X,Y}=V;
+  $('clipRect').setAttribute('x',M.l);$('clipRect').setAttribute('y',M.t-30);$('clipRect').setAttribute('width',W-M.l-M.r);$('clipRect').setAttribute('height',H-M.b-M.t+30);
+  let g='';
+  // 網格
+  for(let v=0;v<=d.y1+1e-12;v+=d.sy){const vv=+v.toFixed(6);g+=`<line x1="${M.l}" x2="${W-M.r}" y1="${Y(vv)}" y2="${Y(vv)}" stroke="#ECE9F7"/><text x="${M.l-8}" y="${Y(vv)+5}" text-anchor="end" font-size="14" fill="#7C819C">${vv===0?'0':String(vv).replace(/^0/,'')}</text>`;}
+  const fx=dd.fx||(v=>String(+v.toFixed(4)));
+  const xt0=Math.ceil((dd.type==='d'?d.k0:d.x0)/d.sx)*d.sx,xt1=dd.type==='d'?d.k1:d.x1;
+  const tfx=dd.tfx||fx,pills=dd.sel?[...new Set(dd.sel.filter(Number.isFinite))].filter(v=>v>=d.x0&&v<=d.x1).map(v=>({v,w:Math.max(40,fx(v).length*10+18)})):[];
+  for(let v=xt0;v<=xt1+1e-9;v+=d.sx){const hide=pills.some(q=>Math.abs(X(v)-X(q.v))<q.w/2+16);g+=`<line y1="${M.t}" y2="${H-M.b}" x1="${X(v)}" x2="${X(v)}" stroke="#F4F2FA"/>`+(hide?'':`<text x="${X(v)}" y="${H-M.b+21}" text-anchor="middle" font-size="15" fill="#7C819C">${tfx(+v.toFixed(4))}</text>`);}
+  g+=`<line x1="${M.l}" x2="${W-M.r}" y1="${H-M.b}" y2="${H-M.b}" stroke="#A9A5C8" stroke-width="1.5"/><line x1="${M.l}" x2="${M.l}" y1="${M.t}" y2="${H-M.b}" stroke="#A9A5C8"/>`;
+  g+=`<text x="${(M.l+W-M.r)/2}" y="${H-10}" text-anchor="middle" font-size="16" fill="#555B7A" font-weight="500">${dd.xlab(s)}</text>`;
+  g+=`<text transform="translate(18 ${(M.t+H-M.b)/2}) rotate(-90)" text-anchor="middle" font-size="16" fill="#555B7A" font-weight="500">${dd.type==='d'?'機率 P(X = x)':'機率密度 f(x)'}</text>`;
+  // z 刻度
+  if(dd.zrow){for(let z=-4;z<=4;z++){const xv=s.mu+z*s.sd;if(xv<d.x0||xv>d.x1)continue;g+=`<line x1="${X(xv)}" x2="${X(xv)}" y1="${H-M.b+28}" y2="${H-M.b+34}" stroke="#6C4BEF" stroke-width="2"/><text x="${X(xv)}" y="${H-M.b+52}" text-anchor="middle" font-size="15" font-weight="700" fill="#4B32B8">${z===0?'0':(z>0?'+':'−')+Math.abs(z)}</text>`;}
+    g+=`<text x="${M.l-8}" y="${H-M.b+52}" text-anchor="end" font-size="15" font-weight="700" fill="#4B32B8">z</text>`;}
+  g+='<g clip-path="url(#plotClip)">';
+  const sel=dd.sel,inS=v=>sel&&v>=sel[0]&&v<=sel[1];
+  let curMax=0,blab='';
+  if(dd.type==='d'){
+    const bw=(X(1)-X(0))*0.78;
+    for(let k=d.k0;k<=d.k1;k++){const p=dd.pmf(k,s);curMax=Math.max(curMax,p);if(p<=0)continue;const on=inS(k);
+      g+=`<rect x="${X(k)-bw/2}" y="${Y(p)}" width="${bw}" height="${Math.max(0,Y(0)-Y(p))}" rx="${Math.min(3,bw/4)}" fill="${on?'#D61FA3':'#6C4BEF'}" fill-opacity="${on?1:0.5}"><title>P(X = ${k}) = ${fp(p)}</title></rect>`;}
+    // 對照與近似
+    if(key==='hyper'&&$('hyperCmp').checked){const pb=s.S/s.N;for(let k=d.k0;k<=d.k1;k++){if(k>s.n)break;const q=binomPmf(k,s.n,pb);if(q<1e-4)continue;g+=`<circle cx="${X(k)}" cy="${Y(q)}" r="6" fill="#fff" stroke="#0A1045" stroke-width="2.5"><title>放回：${fp(q)}</title></circle>`;}}
+    if(key==='binom'&&$('binomApprox').checked){const m=s.n*s.p,sd=Math.sqrt(s.n*s.p*(1-s.p));let path='';for(let i=0;i<=240;i++){const x=d.x0+(d.x1-d.x0)*i/240;path+=(i?'L':'M')+X(x).toFixed(1)+' '+Y(npdf(x,m,sd)).toFixed(1);}g+=`<path d="${path}" fill="none" stroke="#0A1045" stroke-width="2.5"/>`;}
+    // 選取標示（單一或少數長條）
+    if(sel){const k0=Math.max(d.k0,sel[0]),k1=Math.min(d.k1,sel[1]);if(k1-k0<=3&&k1>=k0)for(let k=k0;k<=k1;k++){const p=dd.pmf(k,s);if(p>0)blab+=`<text x="${X(k)}" y="${Y(p)-8}" text-anchor="middle" font-size="15" font-weight="700" fill="#A3127B">${fp(p)}</text>`;}}
+  } else {
+    const br=(dd.brk?dd.brk(s):[]);
+    const samp=(a,b,n)=>{const xs=[];for(let i=0;i<=n;i++)xs.push(a+(b-a)*i/n);br.forEach(v=>{if(v>a&&v<b)xs.push(v);});return xs.sort((p,q)=>p-q);};
+    const area=(a,b)=>{const xs=samp(a,b,220);let p=`M${X(a).toFixed(1)} ${Y(0)}`;xs.forEach(x=>{p+=`L${X(x).toFixed(1)} ${Y(Math.min(dd.pdf(x,s),d.y1*1.02)).toFixed(1)}`;});return p+`L${X(b).toFixed(1)} ${Y(0)}Z`;};
+    if(key==='norm'&&$('normBands').checked){[[3,.07],[2,.09],[1,.13]].forEach(([k,o])=>{g+=`<path d="${area(Math.max(d.x0,s.mu-k*s.sd),Math.min(d.x1,s.mu+k*s.sd))}" fill="#6C4BEF" fill-opacity="${o}"/>`;});
+      [[1,'68.27%'],[2,'95.45%'],[3,'99.73%']].forEach(([k,t],i)=>{const y=Y(0)-14-i*24;const x1=X(s.mu-k*s.sd),x2=X(s.mu+k*s.sd);g+=`<line x1="${x1}" x2="${x2}" y1="${y}" y2="${y}" stroke="#4B32B8" stroke-width="1.5"/><line x1="${x1}" x2="${x1}" y1="${y-5}" y2="${y+5}" stroke="#4B32B8" stroke-width="1.5"/><line x1="${x2}" x2="${x2}" y1="${y-5}" y2="${y+5}" stroke="#4B32B8" stroke-width="1.5"/><text x="${x2+6}" y="${y+5}" font-size="14" font-weight="700" fill="#4B32B8">${t}</text>`;});}
+    else g+=`<path d="${area(d.x0,d.x1)}" fill="#6C4BEF" fill-opacity=".10"/>`;
+    if(sel&&sel[1]>sel[0]){const a=Math.max(d.x0,sel[0]),b=Math.min(d.x1,sel[1]);if(b>a)g+=`<path d="${area(a,b)}" fill="#D61FA3" fill-opacity=".55" stroke="#D61FA3" stroke-width="1.5"/>`;}
+    const xs=samp(d.x0,d.x1,400);let path='';xs.forEach((x,i)=>{const y=dd.pdf(x,s);curMax=Math.max(curMax,y);path+=(i?'L':'M')+X(x).toFixed(1)+' '+Y(Math.min(y,d.y1*1.02)).toFixed(1);});
+    g+=`<path d="${path}" fill="none" stroke="#6C4BEF" stroke-width="3.5" stroke-linejoin="round"/>`;
+    if(sel&&sel[0]===sel[1]&&Number.isFinite(sel[0]))g+=`<line x1="${X(sel[0])}" x2="${X(sel[0])}" y1="${Y(0)}" y2="${Y(dd.pdf(sel[0],s))}" stroke="#D61FA3" stroke-width="3"/>`;
+  }
+  // 期望值與標準差
+  const mu=dd.mean(s),sd=Math.sqrt(dd.vr(s));
+  if(mu>=d.x0&&mu<=d.x1){
+    const yb=Math.max(M.t+44,Y(Math.min(curMax,d.y1))-(dd.type==='d'?46:24));
+    g+=`<line x1="${X(mu)}" x2="${X(mu)}" y1="${yb-14}" y2="${Y(0)}" stroke="#555B7A" stroke-width="2" stroke-dasharray="6 5"/>`;
+    if(sd>0){const a=X(Math.max(d.x0,mu-sd)),b=X(Math.min(d.x1,mu+sd));
+      g+=`<line x1="${a}" x2="${b}" y1="${yb}" y2="${yb}" stroke="#6C4BEF" stroke-width="3"/><line x1="${a}" x2="${a}" y1="${yb-7}" y2="${yb+7}" stroke="#6C4BEF" stroke-width="3"/><line x1="${b}" x2="${b}" y1="${yb-7}" y2="${yb+7}" stroke="#6C4BEF" stroke-width="3"/>`;
+      g+=`<text x="${b+6}" y="${yb+5}" font-size="14" font-weight="700" fill="#4B32B8">±1 標準差</text>`;}
+    const mtxt=`E(X) = ${dd.meanFx?dd.meanFx(mu):fmt(mu,2)}`,anc=X(mu)>W-M.r-90?'end':X(mu)<M.l+90?'start':'middle';
+    g+=`<text x="${X(mu)}" y="${yb-20}" text-anchor="${anc}" font-size="15" font-weight="700" fill="#555B7A">${mtxt}</text>`;
+  }
+  g+=blab;
+  // 選取結果
+  if(sel){const p=selProb(dd);g+=`<text x="${W-M.r-10}" y="${M.t+4}" text-anchor="end" font-size="20" font-weight="900" fill="#A3127B">${selText(dd)} = ${fp(p)}</text>`;}
+  else g+=`<text x="${W-M.r-10}" y="${M.t+4}" text-anchor="end" font-size="16" fill="#7C819C">在圖上拖曳，選一段範圍來算機率</text>`;
+  g+='</g>';
+  // x 軸上的黃色選取標籤
+  if(sel){const vals=[...new Set(sel.filter(Number.isFinite))];vals.forEach(v=>{if(v<d.x0||v>d.x1)return;const t=fx(v),w=Math.max(40,t.length*10+18);
+    g+=`<rect x="${X(v)-w/2}" y="${H-M.b+5}" width="${w}" height="24" rx="12" fill="#F9E900"/><text x="${X(v)}" y="${H-M.b+22}" text-anchor="middle" font-size="15" font-weight="900" fill="#0A1045" style="stroke:none">${t}</text>`;});}
+  layer.innerHTML=g;
+  updateSide();
+}
 
-        // --- TAB SWITCHING ---
-        function switchTab(tabId) {
-            document.querySelectorAll('.module-panel').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/30');
-                btn.classList.add('text-slate-700', 'hover:bg-cyan-100', 'hover:text-indigo-900');
-            });
-            
-            document.getElementById('module-' + tabId).classList.remove('hidden');
-            const activeBtn = document.getElementById('nav-' + tabId);
-            activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/30');
-            activeBtn.classList.remove('text-slate-700', 'hover:bg-cyan-100', 'hover:text-indigo-900');
+/* ================= 側欄 ================= */
+function statbar(dd){
+  const s=dd.st,mu=dd.mean(s),v=dd.vr(s),sd=Math.sqrt(v),u=dd.unit?' '+dd.unit:'';
+  const mtxt=dd.meanFx?dd.meanFx(mu):fmt(mu,2)+u;
+  let h=`<span><span class="lbl">期望值 E(X)</span><span class="big">${mtxt}</span></span><span><span class="lbl">變異數 Var(X)</span><span class="big">${fmt(v,2)}</span></span><span><span class="lbl">標準差</span><span class="big">${fmt(sd,2)}${dd.key==='unif'?' 分鐘':''}</span></span>`;
+  if(dd.sel)h+=`<span class="psel">${selText(dd)} = ${fp(selProb(dd))}</span>`;
+  $('statbar').innerHTML=h;
+}
+function selBoxHtml(dd){
+  if(!dd.sel)return `<span class="lead">還沒有選取。在圖上拖曳一段範圍${dd.story?'，或按「套用題目設定」':''}。</span>`;
+  const p=selProb(dd);let h=`<div>目前選取：<span class="pv">${selText(dd)} = ${fp(p)}</span></div><div class="lead">約 ${pct(p)}，大概每 ${p>0?fmt(1/p,1):'—'} 次會遇到 1 次。</div>`;
+  if(dd.type==='c'&&dd.sel[0]===dd.sel[1])h+='<div class="c-coral num">連續型隨機變數在單一個值的機率是 0：寬度為 0 的長條沒有面積。</div>';
+  return h;
+}
+function updateSide(){
+  const key=curKey();
+  if(key){const dd=D[key];statbar(dd);const box=document.querySelector(`.panel[data-panel="${st.tab}"] [data-sel]`);if(box)box.innerHTML=selBoxHtml(dd);}
+  // 輸出值
+  document.querySelectorAll('[data-o]').forEach(o=>{const[k,p]=o.dataset.o.split('-');const v=D[k].st[p];
+    o.textContent=k==='unif'?clock(v):p==='p'?v.toFixed(2):k==='pois'&&p==='rate'?fmt(v,1)+' 次':k==='pois'?v+' 週':k==='norm'?fmt(v,1)+' 萬':k==='exp'?fmt(v,1)+' 分':String(v);});
+  document.querySelectorAll('input[data-d]').forEach(i=>{const v=D[i.dataset.d].st[i.dataset.k];if(+i.value!==v)i.value=v;});
+  const P=D.pois.st;$('poisLam').innerHTML=`λ = 每週平均 × 週數 = ${fmt(P.rate,1)} × ${P.t} = <span class="c-blue">${fmt(P.rate*P.t,1)}</span> 次`;
+  const N=D.nb.st;$('nbNote').innerHTML=N.r===1?'<span class="tag">r = 1</span>目前就是<strong>幾何分配</strong>。':`<span class="tag blue">r = ${N.r}</span>目前是<strong>負二項分配</strong>。把 r 拉回 1 就變成幾何分配。`;
+  const E=D.exp.st;$('expLam').innerHTML=`λ = 1 ÷ β = 1 ÷ ${fmt(E.beta,1)} = <span class="c-blue">${fmt(1/E.beta,3)}</span> 位／分鐘`;
+  // 二項常態近似
+  {const s=D.binom.st,m=s.n*s.p,sd=Math.sqrt(s.n*s.p*(1-s.p)),ok=m>=5&&s.n*(1-s.p)>=5,dd=D.binom;
+    let h=`np = ${fmt(m,1)}，n(1 − p) = ${fmt(s.n*(1-s.p),1)}：${ok?'符合近似條件。':'<span class="c-coral">不符合近似條件，近似誤差可能較大。</span>'}`;
+    if(dd.sel){const[lo,hi]=dd.sel;const a=lo===-Infinity?0:Phi((lo-0.5-m)/sd),b=hi===Infinity?1:Phi((hi+0.5-m)/sd);h+=`<br>${selText(dd)}：精確值 ${fp(selProb(dd))}，常態近似（含連續性校正）${fp(Math.max(0,b-a))}`;}
+    $('binomApproxTxt').innerHTML=h;}
+  {const s=D.hyper.st,f=s.N>1?(s.N-s.n)/(s.N-1):0,pb=s.S/s.N;$('fpcTxt').innerHTML=`校正因子 (N − n)/(N − 1) = (${s.N} − ${s.n})/(${s.N} − 1) = ${fmt(f,3)}<br>超幾何 Var = ${fmt(D.hyper.vr(s),3)}；二項（放回）Var = ${fmt(s.n*pb*(1-pb),3)}；抽樣比例 n/N = ${fmt(s.n/s.N,2)}`;}
+  {const s=D.norm.st,dd=D.norm;if(dd.sel){const f=v=>`z = (${fmt(v,1)} − ${fmt(s.mu,1)}) ÷ ${fmt(s.sd,1)} = ${fmt((v-s.mu)/s.sd,2)}`;$('normZ').innerHTML=dd.sel.filter(Number.isFinite).filter((v,i,a)=>a.indexOf(v)===i).map(f).join('<br>')||'—';}else $('normZ').textContent='在圖上選取一段範圍，這裡會顯示換算的 z 值。';}
+  {const b=D.exp.st.beta,sv=+$('memS').value,tv=+$('memT').value;$('memSo').textContent=sv+' 分';$('memTo').textContent=tv+' 分';
+    const a=Math.exp(-(sv+tv)/b),c=Math.exp(-sv/b),q=Math.exp(-tv/b);
+    $('memTxt').innerHTML=`已經等了 ${sv} 分鐘沒人，再等 ${tv} 分鐘也沒人的機率：<br>P(X &gt; ${sv+tv} | X &gt; ${sv}) = ${fp(a)} ÷ ${fp(c)} = <span class="c-coral">${fp(a/c)}</span><br>一開門就等 ${tv} 分鐘沒人：P(X &gt; ${tv}) = <span class="c-coral">${fp(q)}</span>　→ 完全相同`;}
+}
 
-            setTimeout(() => {
-                if (tabId === 'binomial' && binomChart) binomChart.resize();
-                if (tabId === 'hypergeometric' && hyperChart) hyperChart.resize();
-                if (tabId === 'geometric' && geoChart) geoChart.resize();
-                if (tabId === 'poisson' && poisChart) poisChart.resize();
-                if (tabId === 'negative_binomial' && negChart) negChart.resize();
-                if (tabId === 'uniform' && uniChart) uniChart.resize();
-                if (tabId === 'normal' && normChart) normChart.resize();
-                if (tabId === 'exponential' && expChart) expChart.resize();
-            }, 50);
-        }
+/* ================= 互動 ================= */
+function svgPt(ev){const pt=svg.createSVGPoint();pt.x=ev.clientX;pt.y=ev.clientY;return pt.matrixTransform(svg.getScreenCTM().inverse());}
+function snapV(dd,px){const {d,iX}=V;let v=iX(px);
+  if(dd.type==='d'){v=Math.round(v);return Math.max(d.k0,Math.min(d.k1,v));}
+  v=Math.round(v/dd.step)*dd.step;v=+v.toFixed(4);return Math.max(d.x0,Math.min(d.x1,v));}
+let dragA=null;
+svg.addEventListener('pointerdown',ev=>{const key=curKey();if(!key||!V)return;const p=svgPt(ev);const {M}=V;
+  if(p.x<M.l-10||p.x>W-M.r+10||p.y<M.t-30||p.y>H-M.b+40)return;
+  const dd=D[key],v=snapV(dd,p.x);dragA=v;dd.sel=[v,v];svg.setPointerCapture(ev.pointerId);render();});
+svg.addEventListener('pointermove',ev=>{if(dragA===null)return;const dd=D[curKey()],v=snapV(dd,svgPt(ev).x);dd.sel=[Math.min(dragA,v),Math.max(dragA,v)];render();});
+const endDrag=()=>{dragA=null;};svg.addEventListener('pointerup',endDrag);svg.addEventListener('pointercancel',endDrag);
+$('tailL').onclick=()=>{const dd=D[curKey()];if(!dd)return;const v=dd.sel?(Number.isFinite(dd.sel[1])?dd.sel[1]:dd.sel[0]):Math.round(dd.mean(dd.st)/(dd.step||1))*(dd.step||1);dd.sel=[-Infinity,v];render();};
+$('tailR').onclick=()=>{const dd=D[curKey()];if(!dd)return;const v=dd.sel?(Number.isFinite(dd.sel[0])?dd.sel[0]:dd.sel[1]):Math.round(dd.mean(dd.st)/(dd.step||1))*(dd.step||1);dd.sel=[v,Infinity];render();};
+$('selClear').onclick=()=>{const dd=D[curKey()];if(dd){dd.sel=null;render();}};
+function applyStory(name){
+  for(const k in D){const sto=D[k].story;if(sto&&sto[name]){Object.assign(D[k].st,sto[name].st);D[k].sel=[...sto[name].sel];if(D[k].type==='d')ensureDomD(D[k],true);syncSliderLimits();render();return;}}
+}
+document.querySelectorAll('[data-apply]').forEach(b=>b.addEventListener('click',()=>applyStory(b.dataset.apply)));
+$('applyStory').onclick=()=>{const key=curKey();if(!key)return;const names=Object.keys(D[key].story||{});if(!names.length)return;
+  const name=key==='nb'?(D.nb.st.story==='egg'?'nb-egg':'nb-geo'):names[0];applyStory(name);};
+function syncSliderLimits(){
+  const h=D.hyper.st;h.S=Math.min(h.S,h.N);h.n=Math.min(h.n,h.N);
+  const iS=document.querySelector('[data-d="hyper"][data-k="S"]'),in_=document.querySelector('[data-d="hyper"][data-k="n"]');iS.max=h.N;in_.max=h.N;
+  const u=D.unif.st;if(u.b<u.a+10)u.b=u.a+10;if(u.b>90){u.b=90;u.a=Math.min(u.a,80);}
+}
+document.querySelectorAll('input[data-d]').forEach(i=>i.addEventListener('input',()=>{
+  const dd=D[i.dataset.d],k=i.dataset.k;let v=+i.value;
+  if(dd===D.unif&&k==='b'&&v<dd.st.a+10){v=dd.st.a+10;}
+  dd.st[k]=v;syncSliderLimits();render();}));
+$('binomApprox').addEventListener('change',render);$('hyperCmp').addEventListener('change',render);$('normBands').addEventListener('change',render);
+$('memS').addEventListener('input',updateSide);$('memT').addEventListener('input',updateSide);
+// 第 2 頁
+function setDemo(m){st.demo=m;$('demoDBtn').setAttribute('aria-pressed',m==='demoD');$('demoCBtn').setAttribute('aria-pressed',m==='demoC');$('demoDText').hidden=m!=='demoD';$('demoCText').hidden=m!=='demoC';render();}
+$('demoDBtn').onclick=()=>setDemo('demoD');$('demoCBtn').onclick=()=>setDemo('demoC');
+$('demoW').addEventListener('input',e=>{const w=+e.target.value;$('demoWo').textContent=fmt(w,2)+' 萬';D.demoC.sel=[+(10-w/2).toFixed(3),+(10+w/2).toFixed(3)];render();});
+$('demoWo').textContent='1.00 萬';
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>setTab(+b.dataset.go)));
 
-        // --- 1. BINOMIAL ---
-        let binomChart = null;
-        function initBinomial() {
-            const ctx = document.getElementById('binomChart').getContext('2d');
-            binomChart = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: '#4f46e5', borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } }, y: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } } } }
-            });
-            updateBinomial();
-        }
-        function updateBinomial() {
-            const n = parseInt(document.getElementById('binom-n').value);
-            const p = parseFloat(document.getElementById('binom-p').value);
-            document.getElementById('binom-n-val').innerText = n;
-            document.getElementById('binom-p-val').innerText = p.toFixed(2);
-            document.getElementById('binom-mean').innerText = (n * p).toFixed(2);
-            document.getElementById('binom-var').innerText = (n * p * (1 - p)).toFixed(2);
+/* ================= 先猜一猜 ================= */
+const GUESS=[
+  {tab:3,story:'binom',tag:'二項分配',t:'抽獎活動',q:'今晚 20 位客人參加抽獎，每人中獎率 0.2。剛好 6 人中獎的機率大約是多少？',a:0.1091},
+  {tab:5,story:'pois',tag:'Poisson 分配',t:'顧客抱怨',q:'每星期平均收到 3 次顧客抱怨。四個星期合計剛好只收到 6 次抱怨的機率是多少？',a:0.0255},
+  {tab:7,story:'unif',tag:'均勻分配',t:'等物流車',q:'物流車在 20:50～21:20 之間隨機抵達。點貨同事 21:03 下班，下班前等得到物流車的機率是多少？',a:0.4333},
+  {tab:8,story:'norm',tag:'常態分配',t:'營業額',q:'每日營業額平均 10 萬元、標準差 1 萬元。某天營業額低於 8.5 萬元的機率是多少？',a:0.0668}
+];
+$('guessCards').innerHTML=GUESS.map((g,i)=>`<div class="gcard" data-g="${i}">
+  <div class="gtop"><h3>${i+1}. ${g.t}</h3><span class="tag blue">${g.tag}</span></div>
+  <p class="scn">${g.q}</p>
+  <input type="range" min="0" max="100" step="1" value="50" aria-label="你猜的機率">
+  <div class="gv">我猜 <span>50</span>%</div>
+  <button class="btn coral">揭曉</button>
+  <div class="res"></div></div>`).join('');
+document.querySelectorAll('.gcard').forEach(c=>{const i=+c.dataset.g,g=GUESS[i],r=c.querySelector('input'),o=c.querySelector('.gv span');
+  r.addEventListener('input',()=>{o.textContent=r.value;});
+  c.querySelector('.btn.coral').addEventListener('click',()=>{const gu=+r.value/100,diff=gu-g.a,close=Math.abs(diff)<=Math.max(0.05,g.a*0.5);
+    c.querySelector('.res').innerHTML=`<div class="gbar"><span>你猜</span><span class="tr"><span style="width:${gu*100}%;background:var(--coral)"></span></span><b>${(gu*100).toFixed(0)}%</b></div>
+      <div class="gbar"><span>實際</span><span class="tr"><span style="width:${Math.max(0.6,g.a*100)}%;background:var(--blue)"></span></span><b>${(g.a*100).toFixed(1)}%</b></div>
+      <p style="margin:4px 0" class="${close?'':'c-coral'} num">${close?'很接近，直覺不錯！':diff>0?'猜得偏高了。很多人都會高估。':'猜得偏低了。'}</p>
+      <button class="btn" data-goto="${i}">去算算看 →</button>`;
+    c.querySelector('[data-goto]').onclick=()=>{setTab(g.tab);applyStory(g.story);};});});
 
-            const labels = []; const data = [];
-            for (let k = 0; k <= n; k++) {
-                labels.push(k);
-                data.push(combination(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k));
-            }
-            binomChart.data.labels = labels;
-            binomChart.data.datasets[0].data = data;
-            binomChart.update();
-        }
+/* ================= 自我檢測 ================= */
+const QUIZ=[
+ {q:'店長想知道「下午 3 點到 4 點，來客超過 40 人」的機率，平均每小時來客 30 人。最適合用哪一種分配？',o:['二項分配','Poisson 分配','指數分配','均勻分配'],a:1,
+  e:'問的是「一段固定時間內，事件發生幾次」，用 Poisson 分配，λ = 30。指數分配問的是「兩位客人之間要等多久」，兩者描述的是同一個到店過程的兩面，但問題不同。'},
+ {q:'每日營業額服從 N(10, 1²)（萬元）。「某天營業額剛好是 10 萬元整」的機率是多少？',o:['0','約 0.40，也就是曲線最高點 f(10) 的值','0.5，因為 10 萬是平均數','無法計算'],a:0,
+  e:'連續型隨機變數在單一個值的機率是 0，機率是曲線下的<strong>面積</strong>。f(10) ≈ 0.40 是密度的高度，不是機率；0.5 是 P(X &lt; 10)。'},
+ {q:'8 位 PT 中有 5 位學生，隨機挑 3 位排班。為什麼要用超幾何分配，不用二項分配？',o:['因為不放回抽樣，每挑一位，下一位是學生的機率就會改變','因為挑選的人數少於 5 人','因為學生比例超過 0.5','因為二項分配只能用在連續型資料'],a:0,
+  e:'二項分配要求每次試驗的成功機率相同且獨立。從 8 人中不放回地挑，第一位是學生的機率是 5/8，挑走一位學生後只剩 4/7，所以要用超幾何分配。'},
+ {q:'每星期平均收到 3 次抱怨，想算「四個星期內收到 6 次」的機率。Poisson 分配的 λ 應該設多少？',o:['3','6','12','0.75'],a:2,
+  e:'λ 必須和題目問的時間長度一致：每週 3 次 × 4 週 = 12 次。直接用 λ = 3 是最常見的錯誤。'},
+ {q:'客人平均每 2 分鐘來 1 位（指數分配）。已經 5 分鐘沒有客人，接下來 2 分鐘仍沒有客人的機率，和剛開門時 2 分鐘沒有客人的機率相比？',o:['比較小，因為已經等很久，客人「應該」快來了','比較大，因為今天生意比較差','完全相同','無法比較'],a:2,
+  e:'指數分配具有<strong>無記憶性</strong>：P(X &gt; 5 + 2 | X &gt; 5) = P(X &gt; 2) = e⁻¹ ≈ 0.368。「等很久了，應該快來了」是常見的直覺謬誤。'},
+ {q:'營業額 N(10, 1²)（萬元），某天營業額 12 萬元。下列解讀何者正確？',o:['z = 2，比平均高 2 個標準差，營業額至少這麼高的日子約占 2.3%','z = 2，所以發生的機率是 2%','z = 12，非常罕見','營業額超過 12 萬元的機率約為 95%'],a:0,
+  e:'z = (12 − 10) ÷ 1 = 2，表示比平均數高 2 個標準差。P(Z ≥ 2) ≈ 0.0228。z 值本身不是機率，要再換算成曲線下的面積。'}
+];
+let answered={};
+function buildQuiz(){answered={};
+  $('quizBox').innerHTML=QUIZ.map((q,i)=>`<div class="q" data-q="${i}"><h3>${i+1}. ${q.q}</h3><div class="opts">${q.o.map((o,j)=>`<button data-j="${j}">${String.fromCharCode(65+j)}. ${o}</button>`).join('')}</div><div class="exp"></div></div>`).join('');
+  $('score').textContent='';}
+$('quizBox').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;const box=b.closest('.q'),i=+box.dataset.q;if(answered[i]!==undefined)return;
+  const j=+b.dataset.j,q=QUIZ[i];answered[i]=j===q.a;
+  box.querySelectorAll('button').forEach((x,k)=>{if(k===q.a)x.classList.add('right');else if(k===j)x.classList.add('wrong');});
+  const ex=box.querySelector('.exp');ex.classList.add('on');
+  ex.innerHTML=`<strong>${j===q.a?'答對了。':'這題很多人會選錯，正確答案是 '+String.fromCharCode(65+q.a)+'。'}</strong> ${q.e}`;
+  if(Object.keys(answered).length===QUIZ.length){const c=Object.values(answered).filter(Boolean).length;$('score').textContent=`完成！答對 ${c} / ${QUIZ.length} 題。`+(c<QUIZ.length?' 回到對應的分頁再操作一次，會更有感覺。':'');}
+});
+$('quizReset').onclick=buildQuiz;
 
-        // --- 2. HYPERGEOMETRIC ---
-        let hyperChart = null;
-        function initHypergeometric() {
-            const ctx = document.getElementById('hyperChart').getContext('2d');
-            hyperChart = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: '#7c3aed', borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } }, y: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } } } }
-            });
-            updateHypergeometric();
-        }
-        function updateHypergeometric() {
-            const N = parseInt(document.getElementById('hyper-N').value);
-            const K = parseInt(document.getElementById('hyper-K').value);
-            const n = parseInt(document.getElementById('hyper-n').value);
-            document.getElementById('hyper-N-val').innerText = N;
-            document.getElementById('hyper-K-val').innerText = K;
-            document.getElementById('hyper-n-val').innerText = n;
+/* ================= 分頁 ================= */
+const tabs=document.querySelectorAll('nav.tabs button');const NT=tabs.length;
+function setTab(n){
+  st.tab=n;tabs.forEach(b=>b.setAttribute('aria-selected',b.dataset.tab==n));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.dataset.panel==n));
+  $('main').classList.toggle('full',n===1||n===NT);
+  $('applyStory').hidden=(n===2);
+  $('legendHint').innerHTML=n===2&&st.demo==='demoD'||[3,4,5,6].includes(n)?'<span><span class="sw" style="background:#6C4BEF;opacity:.5"></span>紫色長條：各值的機率</span>':'<span><span class="sw" style="background:#6C4BEF"></span>紫色曲線：機率密度</span>';
+  $('legendHint').innerHTML+='　<span><span class="sw dash"></span>灰色虛線：期望值</span>　<span><span class="sw" style="background:#D61FA3"></span>桃紅色：你選取的範圍</span>';
+  render();window.scrollTo({top:0});document.querySelector('.side').scrollTop=0;
+}
+tabs.forEach(b=>b.addEventListener('click',()=>setTab(+b.dataset.tab)));
+document.querySelector('nav.tabs').addEventListener('keydown',e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;let n=st.tab+(e.key==='ArrowRight'?1:-1);n=(n+NT-1)%NT+1;setTab(n);tabs[n-1].focus();});
 
-            const mean = n * (K / N);
-            const variance = n * (K / N) * ((N - K) / N) * ((N - n) / (N - 1));
-            document.getElementById('hyper-mean').innerText = mean.toFixed(2);
-            document.getElementById('hyper-var').innerText = isNaN(variance) ? '0.00' : variance.toFixed(2);
+/* ================= 16:9 縮放與全螢幕 ================= */
+const app=$('app');
+function fitStage(){
+  const on=window.innerWidth>=900&&window.innerWidth/window.innerHeight>=1.15;
+  document.body.classList.toggle('stage',on);document.documentElement.style.fontSize=on?'22px':'';
+  if(on){const k=Math.min(window.innerWidth/1920,window.innerHeight/1080);
+    app.style.transform=`scale(${k})`;app.style.left=((window.innerWidth-1920*k)/2)+'px';app.style.top=((window.innerHeight-1080*k)/2)+'px';}
+  else{app.style.transform='';app.style.left='';app.style.top='';}
+}
+window.addEventListener('resize',()=>{fitStage();render();});fitStage();
+function toggleFS(){if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.();}
+$('fsBtn').onclick=toggleFS;
+document.addEventListener('fullscreenchange',()=>{$('fsBtn').textContent=document.fullscreenElement?'離開全螢幕':'全螢幕';setTimeout(fitStage,50);});
+document.addEventListener('keydown',e=>{if((e.key==='f'||e.key==='F')&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)&&!e.ctrlKey&&!e.metaKey){e.preventDefault();toggleFS();}});
 
-            const labels = []; const data = [];
-            const minX = Math.max(0, n - (N - K));
-            const maxX = Math.min(n, K);
-            for (let x = minX; x <= maxX; x++) {
-                labels.push(x);
-                const prob = (combination(K, x) * combination(N - K, n - x)) / combination(N, n);
-                data.push(isNaN(prob) ? 0 : prob);
-            }
-            hyperChart.data.labels = labels;
-            hyperChart.data.datasets[0].data = data;
-            hyperChart.update();
-        }
-
-        // --- 3. GEOMETRIC ---
-        let geoChart = null;
-        function initGeometric() {
-            const ctx = document.getElementById('geoChart').getContext('2d');
-            geoChart = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: '#e11d48', borderRadius: 4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } }, y: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } } } }
-            });
-            updateGeometric();
-        }
-        function updateGeometric() {
-            const p = parseFloat(document.getElementById('geo-p').value) / 100;
-            document.getElementById('geo-p-val').innerText = (p * 100).toFixed(1) + '%';
-            document.getElementById('geo-mean').innerText = (1 / p).toFixed(1) + ' 次';
-            document.getElementById('geo-var').innerText = ((1 - p) / (p * p)).toFixed(2);
-
-            const labels = []; const data = [];
-            for (let k = 1; k <= 35; k++) {
-                labels.push(k);
-                data.push(Math.pow(1 - p, k - 1) * p);
-            }
-            geoChart.data.labels = labels;
-            geoChart.data.datasets[0].data = data;
-            geoChart.update();
-        }
-
-        // --- 4. POISSON ---
-        let poisChart = null;
-        function initPoisson() {
-            const ctx = document.getElementById('poisChart').getContext('2d');
-            poisChart = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: '#059669', borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } }, y: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } } } }
-            });
-            updatePoisson();
-        }
-        function updatePoisson() {
-            const lambda = parseFloat(document.getElementById('pois-lambda').value);
-            document.getElementById('pois-lambda-val').innerText = lambda.toFixed(1);
-            document.getElementById('pois-mean').innerText = lambda.toFixed(2);
-            document.getElementById('pois-var').innerText = lambda.toFixed(2);
-
-            const labels = []; const data = [];
-            for (let k = 0; k <= Math.max(15, Math.floor(lambda * 2.5)); k++) {
-                labels.push(k);
-                data.push((Math.exp(-lambda) * Math.pow(lambda, k)) / factorial(k));
-            }
-            poisChart.data.labels = labels;
-            poisChart.data.datasets[0].data = data;
-            poisChart.update();
-        }
-
-        // --- 5. NEGATIVE BINOMIAL ---
-        let negChart = null;
-        function initNegBinom() {
-            const ctx = document.getElementById('negChart').getContext('2d');
-            negChart = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: '#d97706', borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } }, y: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } } } }
-            });
-            updateNegBinom();
-        }
-        function updateNegBinom() {
-            const r = parseInt(document.getElementById('neg-r').value);
-            const p = parseFloat(document.getElementById('neg-p').value);
-            document.getElementById('neg-r-val').innerText = r;
-            document.getElementById('neg-p-val').innerText = p.toFixed(2);
-            document.getElementById('neg-mean').innerText = (r / p).toFixed(1);
-            document.getElementById('neg-var').innerText = (r * (1 - p) / (p * p)).toFixed(2);
-
-            const labels = []; const data = [];
-            for (let x = r; x <= r + 30; x++) {
-                labels.push(x);
-                const prob = combination(x - 1, r - 1) * Math.pow(p, r) * Math.pow(1 - p, x - r);
-                data.push(prob);
-            }
-            negChart.data.labels = labels;
-            negChart.data.datasets[0].data = data;
-            negChart.update();
-        }
-
-        // --- 6. UNIFORM ---
-        let uniChart = null;
-        function initUniform() {
-            const ctx = document.getElementById('uniChart').getContext('2d');
-            uniChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels: [], datasets: [{ data: [], borderColor: '#0891b2', backgroundColor: 'rgba(8, 145, 178, 0.3)', fill: true, tension: 0, borderWidth: 3 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } }, y: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } } } }
-            });
-            updateUniform();
-        }
-        function updateUniform() {
-            const a = parseFloat(document.getElementById('uni-a').value);
-            const b = parseFloat(document.getElementById('uni-b').value);
-            document.getElementById('uni-a-val').innerText = a;
-            document.getElementById('uni-b-val').innerText = b;
-
-            const mean = (a + b) / 2;
-            const variance = (a < b) ? Math.pow(b - a, 2) / 12 : 0;
-            document.getElementById('uni-mean').innerText = mean.toFixed(1);
-            document.getElementById('uni-var').innerText = variance.toFixed(2);
-
-            const labels = []; const data = [];
-            const height = (a < b) ? (1 / (b - a)) : 0;
-            for (let x = Math.max(0, a - 3); x <= b + 3; x += 0.5) {
-                labels.push(x.toFixed(1));
-                if (x >= a && x <= b) data.push(height);
-                else data.push(0);
-            }
-            uniChart.data.labels = labels;
-            uniChart.data.datasets[0].data = data;
-            uniChart.update();
-        }
-
-        // --- 7. NORMAL ---
-        let normChart = null;
-        function initNormal() {
-            const ctx = document.getElementById('normChart').getContext('2d');
-            normChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels: [], datasets: [{ data: [], borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.3)', fill: true, tension: 0.4, borderWidth: 3 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } }, y: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } } } }
-            });
-            updateNormal();
-        }
-        function updateNormal() {
-            const mean = parseFloat(document.getElementById('norm-mean').value);
-            const sd = parseFloat(document.getElementById('norm-sd').value);
-            document.getElementById('norm-mean-val').innerText = mean.toFixed(1) + ' 分';
-            document.getElementById('norm-sd-val').innerText = sd.toFixed(1) + ' 分';
-            document.getElementById('norm-mean-stat').innerText = mean.toFixed(2);
-            document.getElementById('norm-var').innerText = (sd * sd).toFixed(2);
-
-            const labels = []; const data = [];
-            for (let x = mean - 3 * sd; x <= mean + 3 * sd; x += sd / 4) {
-                labels.push(x.toFixed(1));
-                const val = (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-Math.pow(x - mean, 2) / (2 * sd * sd));
-                data.push(val);
-            }
-            normChart.data.labels = labels;
-            normChart.data.datasets[0].data = data;
-            normChart.update();
-        }
-
-        // --- 8. EXPONENTIAL ---
-        let expChart = null;
-        function initExponential() {
-            const ctx = document.getElementById('expChart').getContext('2d');
-            expChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels: [], datasets: [{ data: [], borderColor: '#0d9488', backgroundColor: 'rgba(13, 148, 136, 0.3)', fill: true, tension: 0.3, borderWidth: 3 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } }, y: { grid: { color: '#e2e8f0' }, ticks: { color: '#334155', font: { weight: 'bold', size: 13 } } } } }
-            });
-            updateExponential();
-        }
-        function updateExponential() {
-            const lambda = parseFloat(document.getElementById('exp-lambda').value);
-            document.getElementById('exp-lambda-val').innerText = lambda.toFixed(1);
-            document.getElementById('exp-mean').innerText = (1 / lambda).toFixed(1) + ' 個月';
-            document.getElementById('exp-var').innerText = (1 / (lambda * lambda)).toFixed(2);
-
-            const labels = []; const data = [];
-            for (let x = 0; x <= 10; x += 0.2) {
-                labels.push(x.toFixed(1));
-                data.push(lambda * Math.exp(-lambda * x));
-            }
-            expChart.data.labels = labels;
-            expChart.data.datasets[0].data = data;
-            expChart.update();
-        }
-
-        // --- INIT ALL ---
-        window.onload = function() {
-            renderKaTeXFormulas();
-            initBinomial();
-            initHypergeometric();
-            initGeometric();
-            initPoisson();
-            initNegBinom();
-            initUniform();
-            initNormal();
-            initExponential();
-        };
-    </script>
+/* ================= 啟動 ================= */
+D.unif.key='unif';
+buildQuiz();syncSliderLimits();setTab(1);
+window.__D=D;window.__selProb=selProb;window.__setTab=setTab;window.__applyStory=applyStory;
+window.addEventListener('load',()=>{if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});});
+})();
+</script>
 </body>
 </html>
